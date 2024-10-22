@@ -3,49 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Principal</title>
+  <title>Sistema de Seguimiento de Proyectos</title>
   <link rel="stylesheet" href="style-main.css">
 </head>
 <body>
-  <h1>Proyectos</h1>
-  <button id="addProjectBtn">Agregar Proyecto</button>
+  <h1>Sistema de Seguimiento de Proyectos</h1>
+  <button id="newProjectBtn">Agregar nuevo proyecto</button>
+  <div id="projectsContainer"></div>
 
-  <div id="projectList" class="project-list">
-    
-  </div>
-
-  <script>
-    const { ipcRenderer } = require('electron');
-
-    // Abrir la ventana de agregar proyecto
-    document.getElementById('addProjectBtn').addEventListener('click', () => {
-      ipcRenderer.send('open-add-project-window');
-    });
-
-    // Mostrar proyecto agregado en la lista de la pantalla principal con formato de card
-    ipcRenderer.on('project-added', (event, project) => {
-      const projectList = document.getElementById('projectList');
-
-      // Crear una card para el proyecto
-      const projectCard = document.createElement('div');
-      projectCard.classList.add('project-card'); // Asignar clase para estilos
-
-      // Contenido de la card
-      projectCard.innerHTML = `
-        <h3>${project.name}</h3>
-        <p><strong>Cronograma:</strong> ${project.schedule}</p>
-        <p><strong>Costos:</strong> ${project.costs}</p>
-        <p><strong>Actividades:</strong></p>
-        <ul>
-          ${project.tasks.map(task => `<li>${task}</li>`).join('')}
-        </ul>
-      `;
-
-      // Añadir la card a la lista de proyectos
-      projectList.appendChild(projectCard);
-    });
-  </script>
+  <script src="renderer.js"></script>
 </body>
 </html>
+
 
 

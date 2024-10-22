@@ -1,66 +1,58 @@
-// main.js
 const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
 
 let mainWindow;
-let addProjectWindow;
+let projectWindow;
 
-app.whenReady().then(() => {
+function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
-  mainWindow.loadFile('index.html'); // Pantalla principal
 
-  // Crear ventana de agregar proyecto
-  ipcMain.on('open-add-project-window', () => {
-    if (!addProjectWindow) {
-      addProjectWindow = new BrowserWindow({
-        width: 600,
-        height: 500,
-        webPreferences: {
-          nodeIntegration: true,
-          contextIsolation: false,
-        },
-      });
-      addProjectWindow.loadFile(`../Servicio-AdminProyectos/new-project.html`);
+  mainWindow.loadFile('index.html');
+}
 
-      addProjectWindow.on('closed', () => {
-        addProjectWindow = null; // Limpiar la referencia cuando se cierre
-      });
-    }
+function createProjectWindow() {
+  projectWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    parent: mainWindow,
+    modal: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
   });
 
-  // Recibir los datos del proyecto desde la ventana de agregar proyecto
-  ipcMain.on('add-project', (event, projectData) => {
-    // Aquí puedes manejar la lógica, como guardar el proyecto
-    console.log('Nuevo proyecto recibido:', projectData);
+  projectWindow.loadFile('new-project.html');
+}
 
-    // Enviar el proyecto al proceso de la ventana principal
-    mainWindow.webContents.send('project-added', projectData);
-    
-    // Cerrar la ventana de agregar proyecto
-    if (addProjectWindow) {
-      addProjectWindow.close();
-      addProjectWindow = null;
-    }
-  });
+app.whenReady().then(() => {
+  createMainWindow();
 
-  // Cerrar la ventana de agregar proyecto
-  ipcMain.on('close-window', () => {
-    if (addProjectWindow) {
-      addProjectWindow.close();
-      addProjectWindow = null;
-    }
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
   });
+});
+
+ipcMain.on('open-new-project-window', () => {
+  createProjectWindow();
+});
+
+ipcMain.on('add-project', (event, projectData) => {
+  mainWindow.webContents.send('new-project', projectData);
+  projectWindow.close();
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  if (process.platform !== 'darwin') app.quit();
 });
+
 
