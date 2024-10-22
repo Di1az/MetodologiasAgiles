@@ -9,6 +9,7 @@ app.use(express.json());
 /////////////////// CRUD PROYECTO ///////////////////
 
 // Obtener todos los proyectos
+
 app.get('/proyectos', async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM Proyecto');
@@ -18,11 +19,11 @@ app.get('/proyectos', async (req, res) => {
     }
 });
 
-// Obtener un proyecto por ID
-app.get('/proyectos/:id', async (req, res) => {
-    const { id } = req.params;
+// Obtener un proyecto por nombre
+app.get('/proyectos/:nombre', async (req, res) => {
+    const { nombre } = req.params;
     try {
-        const [rows] = await db.query('SELECT * FROM Proyecto WHERE id_proyecto = ?', [id]);
+        const [rows] = await db.query('SELECT * FROM proyecto WHERE nombre = ?', [nombre]);
         if (rows.length === 0) return res.status(404).json({ message: 'Proyecto no encontrado' });
         res.json(rows[0]);
     } catch (error) {
