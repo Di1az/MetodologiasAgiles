@@ -12,7 +12,7 @@ ipcRenderer.on('new-project', (event, projectData) => {
   projectContainer.appendChild(projectCard);
 });
 
-// Escuchar evento de clic en el botón de editar proyecto
+//Escuchar evento de clic en el botón de editar proyecto
 function createProjectCard(projectData) {
   const projectCard = document.createElement('div');
   projectCard.classList.add('project-card');
@@ -25,38 +25,34 @@ function createProjectCard(projectData) {
     <button class="edit-btn">Editar Proyecto</button>
   `;
   
-  // Evento de clic para editar el proyecto
+  
   projectCard.querySelector('.edit-btn').addEventListener('click', () => {
-    ipcRenderer.send('open-edit-project-window', projectData);
-    
+    // Asegurarte de que los datos actuales del proyecto se envíen correctamente al abrir la ventana de edición
+    const updatedProjectData = JSON.parse(projectCard.dataset.projectData || JSON.stringify(projectData));
+    ipcRenderer.send('open-edit-project-window', updatedProjectData);
   });
 
   return projectCard;
 }
 
-// Recibir datos del proyecto a editar
-ipcRenderer.on('update-project-data', (event, projectData) => {
-  win.loadfile("update-project.html");
-  console.log("aaaa");
-  console.log(projectData);
-  document.getElementById('nombre').value = projectData.name;
-  document.getElementById('descripcion').value = projectData.description;
-  document.getElementById('fecha_inicio').value = projectData.startDate;
-  document.getElementById('fecha_termino').value = projectData.endDate;
-});
-
-// Enviar proyecto actualizado al proceso principal
-document.getElementById('update-project-form')?.addEventListener('submit', (event) => {
-  event.preventDefault();
+// Escuchar cuando un proyecto es actualizado
+ipcRenderer.on('project-updated', (event, updatedProjectData) => {
+  console.log("Proyecto actualizado recibido:", updatedProjectData);
   
-  const updatedProject = {
-    name: document.getElementById('nombre').value,
-    description: document.getElementById('descripcion').value,
-    startDate: document.getElementById('fecha_inicio').value,
-    endDate: document.getElementById('fecha_termino').value,
-  };
+  const projectCards = document.querySelectorAll('.project-card');
 
-  ipcRenderer.send('update-project', updatedProject);
-
-
+  projectCards.forEach((card) => {
+    const projectName = card.querySelector('h3').textContent;
+    
+    if (projectName === updatedProjectData.name) {
+      // Actualiza los datos de la tarjeta del proyecto
+      card.querySelector('p:nth-of-type(1)').textContent = `Descripción: ${updatedProjectData.description}`;
+      card.querySelector('p:nth-of-type(2)').textContent = `Fecha de Inicio: ${updatedProjectData.startDate}`;
+      card.querySelector('p:nth-of-type(3)').textContent = `Fecha Final: ${updatedProjectData.endDate}`;
+      
+      // Actualizar la referencia al objeto `projectData` en la tarjeta
+      card.dataset.projectData = JSON.stringify(updatedProjectData);
+    }
+  });
 });
+

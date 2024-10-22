@@ -19,6 +19,7 @@ function createMainWindow() {
   mainWindow.loadFile('index.html');
 }
 
+
 function createProjectWindow() {
   projectWindow = new BrowserWindow({
     width: 800,
@@ -35,6 +36,7 @@ function createProjectWindow() {
   projectWindow.loadFile('new-project.html');
 }
 
+/*
 function createEditProjectWindow(projectData) {
   editProjectWindow = new BrowserWindow({
     width: 800,
@@ -55,7 +57,7 @@ function createEditProjectWindow(projectData) {
     editProjectWindow.webContents.send('update-project-data', projectData);
     console.log(projectData.name);
   });
-}
+}*/
 
 app.whenReady().then(() => {
   createMainWindow();
@@ -72,6 +74,27 @@ ipcMain.on('open-new-project-window', () => {
 ipcMain.on('open-edit-project-window', (event, projectData) => {
   createEditProjectWindow(projectData);
 });
+
+function createEditProjectWindow(projectData) {
+  editProjectWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    parent: mainWindow,
+    modal: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
+
+  editProjectWindow.loadFile('update-project.html');
+  
+  // Enviar los datos del proyecto actualizados a la ventana de edición
+  editProjectWindow.webContents.on('did-finish-load', () => {
+    editProjectWindow.webContents.send('update-project-data', projectData);
+  });
+}
 
 ipcMain.on('add-project', (event, projectData) => {
   mainWindow.webContents.send('new-project', projectData);
