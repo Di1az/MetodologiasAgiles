@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuevo Proyecto</title>
+  <link rel="stylesheet" href="style-new-project.css">
+</head>
+<body>
+  <h2>Agregar Nuevo Proyecto</h2>
+  <form id="projectForm">
+    <label for="name">Nombre del Proyecto:</label>
+    <input type="text" id="name" required><br><br>
+    
+    <label for="schedule">Cronograma:</label>
+    <input type="text" id="schedule" required><br><br>
+
+    <label for="costs">Control de Costos:</label>
+    <input type="number" id="costs" required><br><br>
+
+    <label for="taskInput">Actividades:</label>
+    <input type="text" id="taskInput" placeholder="Escribe una actividad">
+    <button type="button" id="addTaskBtn">Agregar Actividad</button><br><br>
+
+    <ul id="taskList"></ul>
+
+    <div class="button-group">
+      <button type="button" id="closeBtn">Cerrar</button>
+      <button type="submit">Guardar Proyecto</button>
+    </div>
+  </form>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+    const taskInput = document.getElementById('taskInput');
+    const taskList = document.getElementById('taskList');
+    let tasks = [];
+
+    // Agregar actividad a la lista
+    document.getElementById('addTaskBtn').addEventListener('click', () => {
+      const task = taskInput.value.trim();
+      if (task) {
+        tasks.push(task);
+        renderTaskList();
+        taskInput.value = ''; // Limpiar campo
+      }
+    });
+
+    // Eliminar actividad
+    function removeTask(index) {
+      tasks.splice(index, 1);
+      renderTaskList();
+    }
+
+    // Renderizar la lista de actividades
+    function renderTaskList() {
+      taskList.innerHTML = '';
+      tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.textContent = task;
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Eliminar';
+        removeBtn.onclick = () => removeTask(index);
+        li.appendChild(removeBtn);
+        taskList.appendChild(li);
+      });
+    }
+
+    // Enviar proyecto al proceso principal
+    document.getElementById('projectForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const projectData = {
+        name: document.getElementById('name').value,
+        schedule: document.getElementById('schedule').value,
+        tasks: tasks,
+        costs: document.getElementById('costs').value
+      };
+      ipcRenderer.send('add-project', projectData);
+    });
+
+    // Cerrar ventana
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      ipcRenderer.send('close-window');
+    });
+  </script>
+</body>
+</html>
+
+
+
+
