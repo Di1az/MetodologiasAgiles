@@ -167,3 +167,6 @@ app.post('/admins', async (req, res) => {
 app.listen(port, () => {
     console.log(`Microservicio escuchando en http://localhost:${port}`);
 });
+
+//Exportar el modulo app para facil testeo
+module.exports=app;
