@@ -1,12 +1,16 @@
-require('dotenv').config();
-const mysql = require('mysql2');
+import dotenv from 'dotenv'; // Import dotenv
+import mysql from 'mysql2'; // Import mysql2
 
-// Crear la conexión a la base de datos
+// Load environment variables from .env file
+dotenv.config();
+
+// Create the database connection pool
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
-  password: 'admin',
+  password: 'beCCerrin123.',
   database: 'gestion_proyectos'
 });
 
-module.exports = pool.promise();
+// Export the promise version of the pool
+export default pool.promise();
