@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nuevo Proyecto</title>
-  <link rel="stylesheet" href="style-new-project.css">
+  <link rel="stylesheet" href="../css/style-new-project.css">
 </head>
 <body>
   <h2>Agregar Nuevo Proyecto</h2>
@@ -31,7 +31,7 @@
   <script>
     const { ipcRenderer } = require('electron');
 
-    // Guardar el proyecto sin actividades, con descripción y fechas
+    // Guardar el proyecto con descripción y fechas
     document.getElementById('projectForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const projectData = {

@@ -16,7 +16,7 @@ function createMainWindow() {
     },
   });
 
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile('./view/index.html');
 }
 
 
@@ -33,31 +33,8 @@ function createProjectWindow() {
     },
   });
 
-  projectWindow.loadFile('new-project.html');
+  projectWindow.loadFile('./view/new-project.html');
 }
-
-/*
-function createEditProjectWindow(projectData) {
-  editProjectWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    parent: mainWindow,
-    modal: true,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
-  });
-
-  editProjectWindow.loadFile('update-project.html');
-  
-  // Enviar datos del proyecto a la ventana de edición
-  editProjectWindow.webContents.on('did-finish-load', () => {
-    editProjectWindow.webContents.send('update-project-data', projectData);
-    console.log(projectData.name);
-  });
-}*/
 
 app.whenReady().then(() => {
   createMainWindow();
@@ -88,7 +65,7 @@ function createEditProjectWindow(projectData) {
     },
   });
 
-  editProjectWindow.loadFile('update-project.html');
+  editProjectWindow.loadFile('./view/update-project.html');
   
   // Enviar los datos del proyecto actualizados a la ventana de edición
   editProjectWindow.webContents.on('did-finish-load', () => {
