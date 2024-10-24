@@ -1,5 +1,5 @@
-import express from 'express'; // Import express
-import db from './db.js'; // Import the database connection (make sure to add .js extension)
+import express from 'express'; 
+import db from './db.js'; 
 const app = express();
 const port = 3000;
 
@@ -10,8 +10,6 @@ app.use(express.json());
 
 // Get all projects
 app.get('/proyectos', async (req, res) => {
-    console.log('consultaron');
-
     try {
         const [rows] = await db.query('SELECT * FROM Proyecto');
         res.json(rows);
