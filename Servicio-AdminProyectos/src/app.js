@@ -1,15 +1,14 @@
-const express = require('express');
-const db = require('./db');  // Importar la conexión de la base de datos
+import express from 'express'; 
+import db from './db.js'; 
 const app = express();
 const port = 3000;
 
-// Middleware para parsear JSON
+// Middleware to parse JSON
 app.use(express.json());
 
 /////////////////// CRUD PROYECTO ///////////////////
 
-// Obtener todos los proyectos
-
+// Get all projects
 app.get('/proyectos', async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM Proyecto');
@@ -19,11 +18,11 @@ app.get('/proyectos', async (req, res) => {
     }
 });
 
-// Obtener un proyecto por nombre
-app.get('/proyectos/:nombre', async (req, res) => {
-    const { nombre } = req.params;
+// Get a project by ID
+app.get('/proyectos/:id', async (req, res) => {
+    const { id } = req.params;
     try {
-        const [rows] = await db.query('SELECT * FROM proyecto WHERE nombre = ?', [nombre]);
+        const [rows] = await db.query('SELECT * FROM Proyecto WHERE id_proyecto = ?', [id]);
         if (rows.length === 0) return res.status(404).json({ message: 'Proyecto no encontrado' });
         res.json(rows[0]);
     } catch (error) {
@@ -31,9 +30,10 @@ app.get('/proyectos/:nombre', async (req, res) => {
     }
 });
 
-// Crear un nuevo proyecto
+// Create a new project
 app.post('/proyectos', async (req, res) => {
     const { nombre, descripcion, fecha_inicio, fecha_termino } = req.body;
+    console.log('consultaron');
     try {
         const [result] = await db.query(
             'INSERT INTO Proyecto (nombre, descripcion, fecha_inicio, fecha_termino) VALUES (?, ?, ?, ?)', 
@@ -45,7 +45,7 @@ app.post('/proyectos', async (req, res) => {
     }
 });
 
-// Actualizar un proyecto por ID
+// Update a project by ID
 app.put('/proyectos/:id', async (req, res) => {
     const { id } = req.params;
     const { nombre, descripcion, fecha_inicio, fecha_termino } = req.body;
@@ -61,7 +61,7 @@ app.put('/proyectos/:id', async (req, res) => {
     }
 });
 
-// Eliminar un proyecto por ID
+// Delete a project by ID
 app.delete('/proyectos/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -75,7 +75,7 @@ app.delete('/proyectos/:id', async (req, res) => {
 
 /////////////////// CRUD ACTIVIDAD ///////////////////
 
-// Obtener todas las actividades
+// Get all activities
 app.get('/actividades', async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM Actividad');
@@ -85,7 +85,7 @@ app.get('/actividades', async (req, res) => {
     }
 });
 
-// Crear una nueva actividad
+// Create a new activity
 app.post('/actividades', async (req, res) => {
     const { descripcion, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto } = req.body;
     try {
@@ -99,7 +99,7 @@ app.post('/actividades', async (req, res) => {
     }
 });
 
-// Eliminar una actividad por ID
+// Delete an activity by ID
 app.delete('/actividades/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -113,7 +113,7 @@ app.delete('/actividades/:id', async (req, res) => {
 
 /////////////////// CRUD TRABAJADOR ///////////////////
 
-// Obtener todos los trabajadores
+// Get all workers
 app.get('/trabajadores', async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM Trabajador');
@@ -123,7 +123,7 @@ app.get('/trabajadores', async (req, res) => {
     }
 });
 
-// Crear un nuevo trabajador
+// Create a new worker
 app.post('/trabajadores', async (req, res) => {
     const { nombre_trabajador } = req.body;
     try {
@@ -139,7 +139,7 @@ app.post('/trabajadores', async (req, res) => {
 
 /////////////////// CRUD ADMIN ///////////////////
 
-// Obtener todos los admins
+// Get all admins
 app.get('/admins', async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM Admin');
@@ -149,7 +149,7 @@ app.get('/admins', async (req, res) => {
     }
 });
 
-// Crear un nuevo admin
+// Create a new admin
 app.post('/admins', async (req, res) => {
     const { nombre_admin } = req.body;
     try {
@@ -163,8 +163,11 @@ app.post('/admins', async (req, res) => {
     }
 });
 
-/////////////////// Iniciar el servidor ///////////////////
+/////////////////// Start the server ///////////////////
 
 app.listen(port, () => {
     console.log(`Microservicio escuchando en http://localhost:${port}`);
 });
+
+// Export the app module for easy testing
+export default app;
