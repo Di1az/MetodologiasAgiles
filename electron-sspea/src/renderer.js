@@ -7,9 +7,38 @@ document.getElementById('newProjectBtn').addEventListener('click', () => {
 
 // Mostrar el nuevo proyecto en la interfaz principal
 ipcRenderer.on('new-project', (event, projectData) => {
-  const projectContainer = document.getElementById('projectsContainer');
-  const projectCard = createProjectCard(projectData);
-  projectContainer.appendChild(projectCard);
+  // CAMBIAR FETCH POR APIGATEWAY EN FUTURAS VERSIONES
+  //
+  console.log(projectData,'data del proy');
+  fetch('http://localhost:3000/proyectos', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      nombre: projectData.name,
+      descripcion: projectData.description,
+      fecha_inicio: projectData.endDate,
+      fecha_termino: projectData.startDate
+    })
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Fallo al crear el proyecto');
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log('Proyecto creado:', data);
+
+      // crear card después de crear proyecto
+      const projectContainer = document.getElementById('projectsContainer');
+      const projectCard = createProjectCard(projectData);
+      projectContainer.appendChild(projectCard);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
 });
 
 //Escuchar evento de clic en el botón de editar proyecto
