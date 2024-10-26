@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Dashboard</title>
+    <link rel="stylesheet" href="../css/project-view.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        
+        <h2 class="title-lista">Proyectos</h2>
+        <ul class="proy-list">
+          <div class="div-proy-lista">
+            <li class="project-item">Proyecto 1</li>
+            <div class="bar-under-proy"></div>
+          </div>
+
+          <div class="div-proy-lista">
+            <li class="project-item active">Proyecto 2</li>
+            <div class="bar-under-proy-active"></div>
+          </div>
+
+          <div class="div-proy-lista">
+            <li class="project-item">Proyecto 3</li>
+            <div class="bar-under-proy"></div>
+          </div>
+        </ul>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <div class="header">
+          <div class="big-title">
+            <p class="title-proy-select">Proyecto 2</p>
+            <div class="separator"></div>
+            <button class="edit-btn">
+              <img src="../assets/icons/icons8-editar.svg" alt="Edit Icon" />
+              Editar proyecto
+            </button>
+          </div>
+          <div class="background-activities">
+            <!-- Activity Columns -->
+            <div class="activity-columns">
+              <!-- Column 1 -->
+              <div class="activity-column">
+                <h3>Por hacer</h3>
+                <div class="activity-card">Act por hacer 1</div>
+                <button class="add-activity-btn">+ Añadir actividad</button>
+              </div>
+
+              <!-- Column 2 -->
+              <div class="activity-column">
+                <h3>En proceso</h3>
+                <div class="activity-card">Act en proceso 1</div>
+                <div class="activity-card">Act en proceso 2</div>
+                <button class="add-activity-btn">+ Añadir actividad</button>
+              </div>
+
+              <!-- Column 3 -->
+              <div class="activity-column">
+                <h3>En proceso</h3>
+                <div class="activity-card">Act terminada 1</div>
+                <div class="activity-card">Act terminada 2</div>
+                <button class="add-activity-btn">+ Añadir actividad</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
