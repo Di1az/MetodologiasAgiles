@@ -7,6 +7,11 @@ document.getElementById("newProjectBtn").addEventListener("click", () => {
 
 // Mostrar el nuevo proyecto en la interfaz principal
 ipcRenderer.on("new-project", (event, projectData) => {
+
+  const projectContainer = document.getElementById('projectsContainer');
+  const projectCard = createProjectCard(projectData);
+  projectContainer.appendChild(projectCard);
+
   // CAMBIAR FETCH POR APIGATEWAY EN FUTURAS VERSIONES
   //
   console.log(projectData, "data del proy");
@@ -62,7 +67,6 @@ function createProjectCard(projectData) {
   `;
 
   projectCard.querySelector(".edit-btn").addEventListener("click", () => {
-    // Asegurarte de que los datos actuales del proyecto se envíen correctamente al abrir la ventana de edición
     const updatedProjectData = JSON.parse(
       projectCard.dataset.projectData || JSON.stringify(projectData)
     );
