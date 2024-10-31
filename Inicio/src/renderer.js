@@ -66,11 +66,16 @@ function createProjectCard(projectData) {
     
   `;
 
+  projectCard.querySelector(".add-act").addEventListener("click", () => {
+    ipcRenderer.send("open-project-view");
+  });
+
   projectCard.querySelector(".edit-btn").addEventListener("click", () => {
     const updatedProjectData = JSON.parse(
       projectCard.dataset.projectData || JSON.stringify(projectData)
     );
     ipcRenderer.send("open-edit-project-window", updatedProjectData);
+
   });
 
   return projectCard;
@@ -102,3 +107,5 @@ ipcRenderer.on("project-updated", (event, updatedProjectData) => {
     }
   });
 });
+
+
