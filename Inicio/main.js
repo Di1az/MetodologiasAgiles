@@ -1,11 +1,11 @@
-const { app, BrowserWindow, ipcMain, webContents } = require('electron');
-const path = require('path');
+const { app, BrowserWindow, ipcMain, webContents } = require("electron");
+const path = require("path");
 
 let mainWindow;
 let projectWindow;
 let editProjectWindow;
-let projectViewWindow; 
-
+let projectViewWindow;
+let newActivity;
 //LOGIN WINDOW
 let loginWindow;
 
@@ -14,13 +14,13 @@ function createLoginWindow() {
     width: 500,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
 
-  loginWindow.loadURL('http://localhost:3001/auth/google');
+  loginWindow.loadURL("http://localhost:3001/auth/google");
 }
 
 function createMainWindow() {
@@ -28,13 +28,13 @@ function createMainWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
 
-  mainWindow.loadFile('./view/index.html');
+  mainWindow.loadFile("./view/index.html");
 }
 
 function createProjectWindow() {
@@ -44,15 +44,14 @@ function createProjectWindow() {
     parent: mainWindow,
     modal: true,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
 
-  projectWindow.loadFile('./view/new-project.html');
+  projectWindow.loadFile("./view/new-project.html");
 }
-
 
 // app.whenReady().then(() => {
 //   createMainWindow();
@@ -62,7 +61,6 @@ function createProjectWindow() {
 //   });
 // });
 
-
 function createEditProjectWindow(projectData) {
   editProjectWindow = new BrowserWindow({
     width: 800,
@@ -70,17 +68,17 @@ function createEditProjectWindow(projectData) {
     parent: mainWindow,
     modal: true,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
 
-  editProjectWindow.loadFile('./view/update-project.html');
-  
+  editProjectWindow.loadFile("./view/update-project.html");
+
   // Enviar los datos del proyecto actualizados a la ventana de edición
-  editProjectWindow.webContents.on('did-finish-load', () => {
-    editProjectWindow.webContents.send('update-project-data', projectData);
+  editProjectWindow.webContents.on("did-finish-load", () => {
+    editProjectWindow.webContents.send("update-project-data", projectData);
   });
 }
 
@@ -89,31 +87,54 @@ function openProjectViewWindow(projectData) {
     width: 1920,
     height: 1080,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
 
-  projectViewWindow.loadFile('./view/project-view.html');
+  projectViewWindow.loadFile("./view/project-view.html");
   projectViewWindow.center();
 
-  projectViewWindow.webContents.on('did-finish-load',() =>{
-    projectViewWindow.webContents.send('load-project',projectData);
+  projectViewWindow.webContents.on("did-finish-load", () => {
+    projectViewWindow.webContents.send("load-project", projectData);
   });
 
   // Evento para manejar el cierre de projectViewWindow
-  projectViewWindow.on('closed', () => {
+  projectViewWindow.on("closed", () => {
     projectViewWindow = null;
   });
 }
 
+function openNewActivityWindow(data) {
+  newActivity = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
+
+  newActivity.loadFile("./view/new-activity.html");
+  newActivity.center();
+
+  newActivity.webContents.on("did-finish-load", () => {
+    newActivity.webContents.send("load-state", data);
+  });
+
+  // Evento para manejar el cierre de projectViewWindow
+  newActivity.on("closed", () => {
+    newActivity = null;
+  });
+}
 // Eventos IPC
-ipcMain.on('open-new-project-window', () => {
+ipcMain.on("open-new-project-window", () => {
   createProjectWindow();
 });
 
-ipcMain.on('open-edit-project-window', (event, projectData) => {
+ipcMain.on("open-edit-project-window", (event, projectData) => {
   createEditProjectWindow(projectData);
 });
 
@@ -123,29 +144,32 @@ ipcMain.on("open-project-view", (event, projectData) => {
   }
 });
 
-ipcMain.on('add-project', (event, projectData) => {
-  mainWindow.webContents.send('new-project', projectData);
+ipcMain.on("add-project", (event, projectData) => {
+  mainWindow.webContents.send("new-project", projectData);
   projectWindow.close();
 });
 
-ipcMain.on('update-project', (event, updatedProjectData) => {
-  mainWindow.webContents.send('project-updated', updatedProjectData);
+ipcMain.on("update-project", (event, updatedProjectData) => {
+  mainWindow.webContents.send("project-updated", updatedProjectData);
   editProjectWindow.close();
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });
 
+ipcMain.on("new-activity", (event, data) => {
+  if (!newActivity) {
+    openNewActivityWindow(data);
+  }
+});
 
 //LOGIN SUCCES
 app.whenReady().then(() => {
   createLoginWindow();
 
-  ipcMain.on('login-success', () => {
+  ipcMain.on("login-success", () => {
     if (loginWindow) loginWindow.close(); // Close login window
     createMainWindow(); // Open main window after login
   });
 });
-
-

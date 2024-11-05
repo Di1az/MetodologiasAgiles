@@ -8,16 +8,16 @@
 </head>
 <body>
     <h2>Agregar Nueva Actividad</h2>
-    <form id="projectForm">
-      <label for="name">Nombre de la Actividad:</label>
-      <input type="text" id="name" required><br>
+    <form id="actForm">
+      <label for="descripcion">Descripción de la Actividad:</label>
+      <input type="text" id="descripcion" required><br>
   
       <label for="status">Estado:</label>
       <select id="status" required>
         <option value="" disabled selected>Seleccione un estado</option>
         <option value="Por hacer">Por hacer</option>
-        <option value="En proceso">En proceso</option>
-        <option value="Terminado">Terminado</option>
+        <option value="En curso">En curso</option>
+        <option value="Terminada">Terminada</option>
       </select><br><br>
   
       <label for="cost">Costo:</label>
@@ -29,11 +29,9 @@
       <label for="endDate">Fecha Final:</label>
       <input type="date" id="endDate" required><br><br>
   
+      <!-- luego cambiamos por una consulta sobre los trabajadores -->
       <label for="responsibleId">ID del Responsable:</label>
       <input type="text" id="responsibleId" required><br><br>
-  
-      <label for="projectId">ID del Proyecto:</label>
-      <input type="text" id="projectId" required><br><br>
   
       <!-- Botones alineados -->
       <div class="button-group">
@@ -41,5 +39,6 @@
         <button type="submit">Guardar Actividad</button>
       </div>
     </form>
+    <script src="../src/renderer-add-act.js"></script>
 </body>
 </html>

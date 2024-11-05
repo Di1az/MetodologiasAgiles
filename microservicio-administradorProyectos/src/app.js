@@ -98,6 +98,20 @@ app.post('/actividades', async (req, res) => {
     }
 });
 
+// Get activities by project ID
+app.get('/actividades/proyecto/:id_proyecto', async (req, res) => {
+    const { id_proyecto } = req.params; // Extract the project ID 
+    try {
+        const [rows] = await db.query('SELECT * FROM Actividad WHERE id_proyecto = ?', [id_proyecto]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'No activities found for this project.' });
+        }
+        res.json(rows); // Return the found activities as a JSON response
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Delete an activity by ID
 app.delete('/actividades/:id', async (req, res) => {
     const { id } = req.params;
