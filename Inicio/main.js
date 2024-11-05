@@ -62,14 +62,6 @@ function createProjectWindow() {
 //   });
 // });
 
-ipcMain.on('open-new-project-window', () => {
-  createProjectWindow();
-});
-
-ipcMain.on('open-edit-project-window', (event, projectData) => {
-  createEditProjectWindow(projectData);
-});
-
 
 function createEditProjectWindow(projectData) {
   editProjectWindow = new BrowserWindow({
@@ -112,14 +104,6 @@ function openProjectViewWindow() {
   });
 }
 
-app.whenReady().then(() => {
-  createMainWindow();
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
-  });
-});
-
 // Eventos IPC
 ipcMain.on('open-new-project-window', () => {
   createProjectWindow();
@@ -148,10 +132,6 @@ ipcMain.on('update-project', (event, updatedProjectData) => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
-
-  
-
- 
 
 
 //LOGIN SUCCES
