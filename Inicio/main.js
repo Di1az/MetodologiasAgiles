@@ -164,6 +164,14 @@ ipcMain.on("new-activity", (event, data) => {
   }
 });
 
+// Escucha el evento para guardar actividad y cerrar la ventana
+ipcMain.on("save-activity", (event, activityData) => {
+  mainWindow.webContents.send("activity-saved", activityData);
+  if (newActivity) {
+    newActivity.close();
+  }
+});
+
 //LOGIN SUCCES
 app.whenReady().then(() => {
   createLoginWindow();

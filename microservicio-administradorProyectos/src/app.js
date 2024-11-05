@@ -74,15 +74,26 @@ app.delete('/proyectos/:id', async (req, res) => {
 
 /////////////////// CRUD ACTIVIDAD ///////////////////
 
-// Get all activities
+// Get all activities and filter by proyect id
 app.get('/actividades', async (req, res) => {
+    const { project_id } = req.query;
+
     try {
-        const [rows] = await db.query('SELECT * FROM Actividad');
+        let query = 'SELECT * FROM Actividad';
+        const params = [];
+
+        if (project_id) {
+            query += ' WHERE id_proyecto = ?';
+            params.push(project_id);
+        }
+
+        const [rows] = await db.query(query, params);
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // Create a new activity
 app.post('/actividades', async (req, res) => {

@@ -120,6 +120,8 @@
   cursor: pointer;
   margin-top: 10px;
   font-size: 1em;
+  position: relative;
+  bottom: 0;
 }
 
 .bar-under-proy {
@@ -138,43 +140,42 @@
   z-index: 2;
 }
 
-.triangle-right{
+.triangle-right {
   align-self: end;
-  
+
   height: 0;
   border-top: -30px solid transparent;
-  border-bottom: 20px solid transparent; 
-  
+  border-bottom: 20px solid transparent;
+
   grid-column: 1;
   grid-row: 1;
-  border-right:20px solid #2b2b2b; 
+  border-right: 20px solid #2b2b2b;
   z-index: 3;
 }
 
- .triangle-left{
+.triangle-left {
   align-self: end;
-  width: 0; 
-  height: 0; 
+  width: 0;
+  height: 0;
   border-top: -30px solid transparent;
-  border-bottom: 20px solid transparent; 
+  border-bottom: 20px solid transparent;
   z-index: 3;
   grid-column: 1;
   grid-row: 1;
-  border-left:20px solid #2b2b2b; 
-} 
+  border-left: 20px solid #2b2b2b;
+}
 
-.bar-under-selected-gradient{
+.bar-under-selected-gradient {
   width: 100%;
   height: auto;
   display: grid;
 }
 
 .bar-under-proy-active {
-  background:#28a745;
+  background: #28a745;
   width: 100%;
   height: 1px;
 }
-
 
 .div-proy-lista {
   display: flex;
@@ -185,6 +186,10 @@
 
 .proy-list {
   width: 90%;
+  overflow-y: overlay;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d1d12c #e0e0e000;
+  padding-right: 10px;
 }
 
 .separator {
