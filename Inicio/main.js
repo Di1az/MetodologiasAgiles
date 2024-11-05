@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, webContents } = require('electron');
 const path = require('path');
 
 let mainWindow;
@@ -84,10 +84,10 @@ function createEditProjectWindow(projectData) {
   });
 }
 
-function openProjectViewWindow() {
+function openProjectViewWindow(projectData) {
   projectViewWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 1920,
+    height: 1080,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
@@ -97,6 +97,10 @@ function openProjectViewWindow() {
 
   projectViewWindow.loadFile('./view/project-view.html');
   projectViewWindow.center();
+
+  projectViewWindow.webContents.on('did-finish-load',() =>{
+    projectViewWindow.webContents.send('load-project',projectData);
+  });
 
   // Evento para manejar el cierre de projectViewWindow
   projectViewWindow.on('closed', () => {
@@ -113,9 +117,9 @@ ipcMain.on('open-edit-project-window', (event, projectData) => {
   createEditProjectWindow(projectData);
 });
 
-ipcMain.on("open-project-view", () => {
+ipcMain.on("open-project-view", (event, projectData) => {
   if (!projectViewWindow) {
-    openProjectViewWindow();
+    openProjectViewWindow(projectData);
   }
 });
 

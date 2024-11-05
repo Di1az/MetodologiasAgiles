@@ -33,7 +33,6 @@ app.get('/proyectos/:id', async (req, res) => {
 // Create a new project
 app.post('/proyectos', async (req, res) => {
     const { nombre, descripcion, fecha_inicio, fecha_termino } = req.body;
-    console.log('consultaron');
     try {
         const [result] = await db.query(
             'INSERT INTO Proyecto (nombre, descripcion, fecha_inicio, fecha_termino) VALUES (?, ?, ?, ?)', 
@@ -87,11 +86,11 @@ app.get('/actividades', async (req, res) => {
 
 // Create a new activity
 app.post('/actividades', async (req, res) => {
-    const { descripcion, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto } = req.body;
+    const { descripcion, estado, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto } = req.body;
     try {
         const [result] = await db.query(
-            'INSERT INTO Actividad (descripcion, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto) VALUES (?, ?, ?, ?, ?, ?)',
-            [descripcion, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto]
+            'INSERT INTO Actividad (descripcion, estado, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [descripcion, estado, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto]
         );
         res.status(201).json({ id_actividad: result.insertId });
     } catch (error) {

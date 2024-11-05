@@ -30,10 +30,9 @@ ipcRenderer.on("new-project", (event, projectData) => {
     })
     .then((data) => {
       console.log("Proyecto creado:", data);
-
       // crear card después de crear proyecto
       const projectContainer = document.getElementById("projectsContainer");
-      const projectCard = createProjectCard(projectData);
+      const projectCard = createProjectCard(projectData, data);
       projectContainer.appendChild(projectCard);
     })
     .catch((error) => {
@@ -42,7 +41,7 @@ ipcRenderer.on("new-project", (event, projectData) => {
 });
 
 //Escuchar evento de clic en el botón de editar proyecto
-function createProjectCard(projectData) {
+function createProjectCard(projectData, data) {
   const projectCard = document.createElement("div");
   projectCard.classList.add("project-card");
 
@@ -62,7 +61,8 @@ function createProjectCard(projectData) {
   `;
 
   projectCard.querySelector(".add-act").addEventListener("click", () => {
-    ipcRenderer.send("open-project-view");
+    projectData.idProyecto=data.id_proyecto;
+    ipcRenderer.send("open-project-view", projectData);
   });
 
   projectCard.querySelector(".edit-btn").addEventListener("click", () => {
@@ -73,7 +73,10 @@ function createProjectCard(projectData) {
 
   });
 
+
+
   return projectCard;
+
 }
 
 // Escuchar cuando un proyecto es actualizado

@@ -19,3 +19,4 @@ document.getElementById('update-project-form').addEventListener('submit', (event
 
   ipcRenderer.send('update-project', updatedProject);
 });
+
