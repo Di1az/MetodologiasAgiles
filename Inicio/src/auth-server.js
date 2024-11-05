@@ -14,7 +14,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
-
+    
 // Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
@@ -25,7 +25,11 @@ passport.use(new GoogleStrategy({
     clientSecret: process.env.clientSecret,
     callbackURL: 'http://localhost:3001/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
+
     // Here, you could save user information to your app’s state or database
+    console.log(profile.emails[0].value);
+    console.log(profile.displayName);
+
     return done(null, profile);
 }));
 
@@ -47,11 +51,6 @@ app.get('/auth/google/callback',
       res.redirect('http://localhost:3001/auth/success');
     }
   );
-  
-  app.get('/auth/success', (req, res) => {
-    res.send('Authentication successful! You can close this window.');
-    mainWindow.webContents.send('login-success');
-  });
 
 // Start the server on a port
 app.listen(3001, () => {
