@@ -4,6 +4,7 @@ const path = require('path');
 let mainWindow;
 let projectWindow;
 let editProjectWindow;
+let projectViewWindow; 
 
 //LOGIN WINDOW
 let loginWindow;
@@ -36,7 +37,6 @@ function createMainWindow() {
   mainWindow.loadFile('./view/index.html');
 }
 
-
 function createProjectWindow() {
   projectWindow = new BrowserWindow({
     width: 800,
@@ -53,6 +53,7 @@ function createProjectWindow() {
   projectWindow.loadFile('./view/new-project.html');
 }
 
+
 // app.whenReady().then(() => {
 //   createMainWindow();
 
@@ -68,6 +69,7 @@ ipcMain.on('open-new-project-window', () => {
 ipcMain.on('open-edit-project-window', (event, projectData) => {
   createEditProjectWindow(projectData);
 });
+
 
 function createEditProjectWindow(projectData) {
   editProjectWindow = new BrowserWindow({
@@ -90,6 +92,49 @@ function createEditProjectWindow(projectData) {
   });
 }
 
+function openProjectViewWindow() {
+  projectViewWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
+
+  projectViewWindow.loadFile('./view/project-view.html');
+  projectViewWindow.center();
+
+  // Evento para manejar el cierre de projectViewWindow
+  projectViewWindow.on('closed', () => {
+    projectViewWindow = null;
+  });
+}
+
+app.whenReady().then(() => {
+  createMainWindow();
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
+  });
+});
+
+// Eventos IPC
+ipcMain.on('open-new-project-window', () => {
+  createProjectWindow();
+});
+
+ipcMain.on('open-edit-project-window', (event, projectData) => {
+  createEditProjectWindow(projectData);
+});
+
+ipcMain.on("open-project-view", () => {
+  if (!projectViewWindow) {
+    openProjectViewWindow();
+  }
+});
+
 ipcMain.on('add-project', (event, projectData) => {
   mainWindow.webContents.send('new-project', projectData);
   projectWindow.close();
@@ -103,6 +148,10 @@ ipcMain.on('update-project', (event, updatedProjectData) => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
+
+  
+
+ 
 
 
 //LOGIN SUCCES
