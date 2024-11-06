@@ -61,8 +61,11 @@ function createProjectCard(projectData, data) {
   `;
 
   projectCard.querySelector(".add-act").addEventListener("click", () => {
+  
     projectData.idProyecto=data.id_proyecto;
-    ipcRenderer.send("open-project-view", projectData);
+    localStorage.setItem("proy", JSON.stringify(projectData));
+
+    ipcRenderer.send("open-project-view");
   });
 
   projectCard.querySelector(".edit-btn").addEventListener("click", () => {

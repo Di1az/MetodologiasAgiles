@@ -6,6 +6,7 @@ function loadActivities(projectData) {
 
     // Actualizar título del proyecto
     document.getElementById("title-project").textContent = projectData.name;
+
     console.log(projectData.idProyecto);
 
     // Obtener actividades específicas para este proyecto desde la API
@@ -52,9 +53,10 @@ function loadActivities(projectData) {
 
 
 // Cargar actividades cuando se recibe el evento de cargar el proyecto
-ipcRenderer.on("load-project", (event, projectData) => {
+ipcRenderer.on("load-project", (event) => {
+    const projectData= JSON.parse(localStorage.getItem("proy"));
     loadActivities(projectData);
-
+    console.log("cargo")
     // Agregar eventos para botones de añadir actividad por columna
     document.getElementById("add-act-btn-por-hacer").addEventListener("click", () => {
         ipcRenderer.send("new-activity", { estado: "Por hacer", project_id: projectData.idProyecto });
@@ -65,6 +67,7 @@ ipcRenderer.on("load-project", (event, projectData) => {
     document.getElementById("add-act-btn-terminada").addEventListener("click", () => {
         ipcRenderer.send("new-activity", { estado: "Terminada", project_id: projectData.idProyecto });
     });
+
     //FETCH TO LOAD ALL PROYECTS
     fetch("http://localhost:3000/proyectos", {
         method: "GET",
@@ -105,13 +108,18 @@ function renderProjects(projects, idSelected) {
         projectDiv
             .getElementsByClassName("project-item")[0]
             .addEventListener("click", () => {
-                console.log(project.id_proyecto, "when");
+                console.log(project, "when");
                 // renderSelectedProy(project.id_proyecto);
                 renderProjects(projects, project.id_proyecto);
                 const dataActivites = {
                     idProyecto: project.id_proyecto,
-                    name: project.nombre
+                    name: project.nombre,
+                    endDate: project.fecha_termino,
+                    startDate: project.fecha_inicio,
+                    description: project.descripcion
+
                 }
+               localStorage.setItem("proy", JSON.stringify(dataActivites));
                 loadActivities(dataActivites);
             });
     });
