@@ -33,7 +33,6 @@ app.get('/proyectos/:id', async (req, res) => {
 // Create a new project
 app.post('/proyectos', async (req, res) => {
     const { nombre, descripcion, fecha_inicio, fecha_termino } = req.body;
-    console.log('consultaron');
     try {
         const [result] = await db.query(
             'INSERT INTO Proyecto (nombre, descripcion, fecha_inicio, fecha_termino) VALUES (?, ?, ?, ?)', 
@@ -75,25 +74,50 @@ app.delete('/proyectos/:id', async (req, res) => {
 
 /////////////////// CRUD ACTIVIDAD ///////////////////
 
-// Get all activities
+// Get all activities and filter by proyect id
 app.get('/actividades', async (req, res) => {
+    const { project_id } = req.query;
+
     try {
-        const [rows] = await db.query('SELECT * FROM Actividad');
+        let query = 'SELECT * FROM Actividad';
+        const params = [];
+
+        if (project_id) {
+            query += ' WHERE id_proyecto = ?';
+            params.push(project_id);
+        }
+
+        const [rows] = await db.query(query, params);
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
+
 // Create a new activity
 app.post('/actividades', async (req, res) => {
-    const { descripcion, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto } = req.body;
+    const { descripcion, estado, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto } = req.body;
     try {
         const [result] = await db.query(
-            'INSERT INTO Actividad (descripcion, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto) VALUES (?, ?, ?, ?, ?, ?)',
-            [descripcion, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto]
+            'INSERT INTO Actividad (descripcion, estado, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [descripcion, estado, costo, fecha_inicio, fecha_termino, id_responsable, id_proyecto]
         );
         res.status(201).json({ id_actividad: result.insertId });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get activities by project ID
+app.get('/actividades/proyecto/:id_proyecto', async (req, res) => {
+    const { id_proyecto } = req.params; // Extract the project ID 
+    try {
+        const [rows] = await db.query('SELECT * FROM Actividad WHERE id_proyecto = ?', [id_proyecto]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'No activities found for this project.' });
+        }
+        res.json(rows); // Return the found activities as a JSON response
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
