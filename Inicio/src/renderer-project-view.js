@@ -1,5 +1,6 @@
 const { ipcRenderer } = require("electron");
 
+
 // Función para cargar las actividades
 function loadActivities(projectData) {
     console.log(projectData, "data del proyecto");
@@ -49,12 +50,28 @@ function loadActivities(projectData) {
             });
         })
         .catch((error) => console.error("Error al obtener actividades:", error));
+
+    //boton editar
+    document.getElementById("edit-btn").addEventListener("click", () => {
+        ipcRenderer.send("open-edit-project-window", projectData);
+    });
+
+    //boton eliminar
+    document.getElementById("delete-btn").addEventListener("click", () => {
+        const confirmDelete = confirm("¿Estás seguro de que deseas eliminar este proyecto?");
+    if (confirmDelete) {
+        console.log("se eligió aceptar");
+        ipcRenderer.send("delete-project", projectData.idProyecto);
+        console.log(projectData.idProyecto);
+    }
+    });
+
 }
 
 
 // Cargar actividades cuando se recibe el evento de cargar el proyecto
 ipcRenderer.on("load-project", (event) => {
-    const projectData= JSON.parse(localStorage.getItem("proy"));
+    const projectData = JSON.parse(localStorage.getItem("proy"));
     loadActivities(projectData);
     console.log("cargo")
     // Agregar eventos para botones de añadir actividad por columna
@@ -67,6 +84,9 @@ ipcRenderer.on("load-project", (event) => {
     document.getElementById("add-act-btn-terminada").addEventListener("click", () => {
         ipcRenderer.send("new-activity", { estado: "Terminada", project_id: projectData.idProyecto });
     });
+
+
+
 
     //FETCH TO LOAD ALL PROYECTS
     fetch("http://localhost:3000/proyectos", {
@@ -119,7 +139,7 @@ function renderProjects(projects, idSelected) {
                     description: project.descripcion
 
                 }
-               localStorage.setItem("proy", JSON.stringify(dataActivites));
+                localStorage.setItem("proy", JSON.stringify(dataActivites));
                 loadActivities(dataActivites);
             });
     });
@@ -160,4 +180,8 @@ function renderSelectedProy(idProyecto) {
     } else {
         console.log("No element found with the specified data-id");
     }
+
+
+
+
 }
