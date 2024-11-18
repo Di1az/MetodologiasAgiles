@@ -18,8 +18,8 @@ ipcRenderer.on("new-project", (event, projectData) => {
     body: JSON.stringify({
       nombre: projectData.name,
       descripcion: projectData.description,
-      fecha_inicio: projectData.endDate,
-      fecha_termino: projectData.startDate,
+      fecha_inicio: projectData.startDate,
+      fecha_termino: projectData.endDate,
     }),
   })
     .then((response) => {
@@ -40,6 +40,49 @@ ipcRenderer.on("new-project", (event, projectData) => {
     });
 });
 
+// Función para obtener proyectos de la base de datos y renderizarlos
+function loadProjects() {
+  fetch("http://localhost:3000/proyectos", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Fallo al obtener los proyectos");
+      }
+      return response.json();
+    })
+    .then((projects) => {
+      console.log("Proyectos obtenidos:", projects);
+      renderProjects(projects);
+    })
+    .catch((error) => {
+      console.error("Error al cargar proyectos:", error);
+    });
+}
+
+// Función para renderizar proyectos en el contenedor
+function renderProjects(projects) {
+  const projectContainer = document.getElementById("projectsContainer");
+  projectContainer.innerHTML = ""; // Limpiar proyectos anteriores
+
+  projects.forEach((project) => {
+    // Crear la tarjeta del proyecto
+    const projectData = {
+      idProyecto: project.id_proyecto,
+      name: project.nombre,
+      description: project.descripcion,
+      startDate: project.fecha_inicio,
+      endDate: project.fecha_termino,
+    };
+
+    const projectCard = createProjectCard(projectData, project);
+    projectContainer.appendChild(projectCard);
+  });
+}
+
 //Escuchar evento de clic en el botón de editar proyecto
 function createProjectCard(projectData, data) {
   const projectCard = document.createElement("div");
@@ -52,7 +95,8 @@ function createProjectCard(projectData, data) {
     <img src="../assets/icons/icons8-editar.svg" alt="Icon">
     Editar Proyecto
     </button>
-    <button class="add-act">+ Añadir actividad</button>
+    <button class="add-act">+ Añadir actividad</button><br>
+    <button class="delete-btn">🗑️ Eliminar Proyecto</button>
     </div>
     <p>Descripción: ${projectData.description}</p>
     <p>Fecha de Inicio: ${projectData.startDate}</p>
@@ -61,8 +105,7 @@ function createProjectCard(projectData, data) {
   `;
 
   projectCard.querySelector(".add-act").addEventListener("click", () => {
-  
-    projectData.idProyecto=data.id_proyecto;
+    projectData.idProyecto = data.id_proyecto;
     localStorage.setItem("proy", JSON.stringify(projectData));
 
     ipcRenderer.send("open-project-view");
@@ -73,13 +116,31 @@ function createProjectCard(projectData, data) {
       projectCard.dataset.projectData || JSON.stringify(projectData)
     );
     ipcRenderer.send("open-edit-project-window", updatedProjectData);
-
   });
 
-
+  // Botón para eliminar proyecto
+projectCard.querySelector(".delete-btn").addEventListener("click", () => {
+  if (confirm(`¿Seguro que deseas eliminar el proyecto "${projectData.name}"?`)) {
+    fetch(`http://localhost:3000/proyectos/${data.id_proyecto}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("No se pudo eliminar el proyecto");
+        }
+        console.log("Proyecto eliminado con éxito");
+        projectCard.remove(); // Elimina la tarjeta del DOM
+      })
+      .catch((error) => {
+        console.error("Error al eliminar el proyecto:", error);
+      });
+  }
+});
 
   return projectCard;
-
 }
 
 // Escuchar cuando un proyecto es actualizado
@@ -108,5 +169,12 @@ ipcRenderer.on("project-updated", (event, updatedProjectData) => {
     }
   });
 });
+
+// Llamar a loadProjects cuando se cargue la interfaz
+document.addEventListener("DOMContentLoaded", () => {
+  loadProjects();
+});
+
+
 
 
