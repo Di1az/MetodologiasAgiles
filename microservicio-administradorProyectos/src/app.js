@@ -1,5 +1,5 @@
-import express from 'express'; 
-import db from './db.js'; 
+import express from 'express';
+import db from './db.js';
 const app = express();
 const port = 3000;
 
@@ -35,7 +35,7 @@ app.post('/proyectos', async (req, res) => {
     const { nombre, descripcion, fecha_inicio, fecha_termino } = req.body;
     try {
         const [result] = await db.query(
-            'INSERT INTO Proyecto (nombre, descripcion, fecha_inicio, fecha_termino) VALUES (?, ?, ?, ?)', 
+            'INSERT INTO Proyecto (nombre, descripcion, fecha_inicio, fecha_termino) VALUES (?, ?, ?, ?)',
             [nombre, descripcion, fecha_inicio, fecha_termino]
         );
         res.status(201).json({ id_proyecto: result.insertId });
@@ -94,6 +94,38 @@ app.get('/actividades', async (req, res) => {
     }
 });
 
+// Change activity state
+app.put("/actividades/:id/cambiarEstado", async (req, res) => {
+    const { id } = req.params;
+    const { nuevoEstado } = req.body; // nuevoEstado será el estado al que queremos cambiar
+
+    // Validar que el nuevo estado sea válido
+    const estadosValidos = ["Por hacer", "En curso", "Terminada"];
+    if (!estadosValidos.includes(nuevoEstado)) {
+        return res
+            .status(400)
+            .json({
+                error:
+                    "Estado no válido. Estados válidos: Por hacer, En curso, Terminada.",
+            });
+    }
+
+    try {
+        const [result] = await db.query(
+            "UPDATE Actividad SET estado = ? WHERE id_actividad = ?",
+            [nuevoEstado, id]
+        );
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Actividad no encontrada" });
+        }
+
+        res.json({
+            message: `Estado cambiado a '${nuevoEstado}' para la actividad con ID ${id}`,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // Create a new activity
 app.post('/actividades', async (req, res) => {

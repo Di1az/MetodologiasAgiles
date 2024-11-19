@@ -1,7 +1,7 @@
 const { ipcRenderer } = require("electron");
 
-window.onload = function(){    
-      document.getElementById("delete-btn").removeAttribute('click');  
+window.onload = function () {
+    document.getElementById("delete-btn").removeAttribute('click');
 };
 
 // Función para cargar las actividades
@@ -34,8 +34,85 @@ function loadActivities(projectData) {
 
             activities.forEach((activity) => {
                 const activityCard = document.createElement("div");
+                const text = document.createElement("p");
+                text.textContent = activity.descripcion;
+        
+                const btnBackAct = document.createElement("button");
+                btnBackAct.className = "btn-back-act";
+                btnBackAct.textContent = "<";
+        
+                btnBackAct.addEventListener("click", async () => {
+                  let newState;
+                  // Determinar el nuevo estado solo si no está en "Por hacer"
+                  if (activity.estado === "En curso") {
+                    newState = "Por hacer";
+                  } else if (activity.estado === "Terminada") {
+                    newState = "En curso";
+                  } else {
+                    console.log("Activity is already in the earliest state: Por hacer");
+                    return; // No hacer nada si ya está en "Por hacer"
+                  }
+        
+                  try {
+                    const response = await fetch(
+                      `http://localhost:3000/actividades/${activity.id_actividad}/cambiarEstado`,
+                      {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ nuevoEstado: newState }),
+                      }
+                    );
+        
+                    if (!response.ok) {
+                      throw new Error("Error updating activity");
+                    }
+        
+                    console.log(`Activity moved to state: ${newState}`);
+                    // Optionally, update the DOM or reload activities
+                  } catch (error) {
+                    console.error("Failed to move activity back:", error);
+                  }
+                });
+        
+                const btnForwAct = document.createElement("button");
+                btnForwAct.className = "btn-forw-act";
+                btnForwAct.textContent = ">";
+        
+                btnForwAct.addEventListener("click", async () => {
+                  const newState =
+                    activity.estado === "Por hacer" ? "En curso" : "Terminada";
+        
+                  try {
+                    const response = await fetch(
+                      `http://localhost:3000/actividades/${activity.id_actividad}/cambiarEstado`,
+                      {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ nuevoEstado: newState }),
+                      }
+                    );
+        
+                    if (!response.ok) {
+                      throw new Error("Error updating activity");
+                    }
+        
+                    console.log(`Activity moved to state: ${newState}`);
+                    // Optionally, update the DOM or reload activities
+                  } catch (error) {
+                    console.error("Failed to move activity forward:", error);
+                  }
+                });
+        
+                console.log(btnForwAct.className);
+                activityCard.appendChild(text);
+                activityCard.appendChild(btnBackAct);
+                activityCard.appendChild(btnForwAct);
+        
                 activityCard.classList.add("activity-card");
-                activityCard.textContent = activity.descripcion;
 
                 if (activity.estado === "Por hacer") {
                     document.querySelector(".activity-column:nth-child(1)").appendChild(activityCard);
@@ -102,6 +179,11 @@ function loadActivities(projectData) {
                     .catch((error) => console.error("Error al eliminar el proyecto:", error));
             }
         });
+    });
+
+    // Abrir ventana para agregar nuevo proyecto
+    document.getElementById("newProjectBtn").addEventListener("click", () => {
+        ipcRenderer.send("open-new-project-window");
     });
 }
 

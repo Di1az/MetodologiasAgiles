@@ -86,6 +86,17 @@
   padding: 15px 30px;
 }
 
+.newProjectBtn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 1em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 15px 30px;
+}
+
 .edit-btn img {
   width: 30px;
   height: 30px;
@@ -98,8 +109,20 @@
   margin-right: 8px;
 }
 
+.newProjectBtn img {
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+}
+
 .edit-btn:hover, 
 .delete-btn:hover {
+  background-color: #333333; 
+}
+
+.edit-btn:hover, 
+.delete-btn:hover,
+.newProjectBtn:hover {
   background-color: #333333; 
 }
 
@@ -265,4 +288,9 @@
   width: 110%;
   height: 1px;
   margin: 0px 20px 0px 20px;
+}
+
+.btn-back-act, .btn-forw-act{
+  background: transparent;
+  border: 0px;
 }
