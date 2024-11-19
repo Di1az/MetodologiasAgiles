@@ -1,5 +1,8 @@
 const { ipcRenderer } = require("electron");
 
+window.onload = function(){    
+      document.getElementById("delete-btn").removeAttribute('click');  
+};
 
 // Función para cargar las actividades
 function loadActivities(projectData) {
@@ -20,26 +23,20 @@ function loadActivities(projectData) {
             ["Por hacer", "En curso", "Terminadas"].forEach((estado, index) => {
                 const column = document.querySelector(`.activity-column:nth-child(${index + 1})`);
 
-                // Mantén el botón de añadir actividad y el encabezado de la columna
                 const addButton = column.querySelector(".add-activity-btn");
                 const header = column.querySelector("h3");
 
-                // Remueve solo las actividades previas
                 column.querySelectorAll(".activity-card").forEach((card) => card.remove());
-
-                // Añade de nuevo el encabezado y el botón
-                column.innerHTML = ""; // Limpia completamente la columna
+                column.innerHTML = "";
                 column.appendChild(header);
                 column.appendChild(addButton);
             });
 
-            // Distribuir actividades en sus respectivas columnas
             activities.forEach((activity) => {
                 const activityCard = document.createElement("div");
                 activityCard.classList.add("activity-card");
                 activityCard.textContent = activity.descripcion;
 
-                // Agregar a la columna según el estado de la actividad
                 if (activity.estado === "Por hacer") {
                     document.querySelector(".activity-column:nth-child(1)").appendChild(activityCard);
                 } else if (activity.estado === "En curso") {
@@ -51,21 +48,61 @@ function loadActivities(projectData) {
         })
         .catch((error) => console.error("Error al obtener actividades:", error));
 
-    //boton editar
     document.getElementById("edit-btn").addEventListener("click", () => {
         ipcRenderer.send("open-edit-project-window", projectData);
     });
 
-    //boton eliminar
     document.getElementById("delete-btn").addEventListener("click", () => {
-        const confirmDelete = confirm("¿Estás seguro de que deseas eliminar este proyecto?");
-    if (confirmDelete) {
-        console.log("se eligió aceptar");
-        ipcRenderer.send("delete-project", projectData.idProyecto);
-        console.log(projectData.idProyecto);
-    }
-    });
+        const deleteButton = document.getElementById("delete-btn");
+        const newDeleteButton = deleteButton.cloneNode(true);
+        deleteButton.replaceWith(newDeleteButton);
 
+        newDeleteButton.addEventListener("click", () => {
+            if (confirm(`¿Seguro que deseas eliminar el proyecto "${projectData.name}"?`)) {
+                fetch("http://localhost:3000/proyectos", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                    .then((response) => response.json())
+                    .then((projects) => {
+                        const remainingProjects = projects.filter(
+                            (project) => project.id_proyecto !== projectData.idProyecto
+                        );
+                        const lastProject = remainingProjects[remainingProjects.length - 1];
+
+                        if (lastProject) {
+                            const nextProjectData = {
+                                idProyecto: lastProject.id_proyecto,
+                                name: lastProject.nombre,
+                                endDate: lastProject.fecha_termino,
+                                startDate: lastProject.fecha_inicio,
+                                description: lastProject.descripcion,
+                            };
+                            localStorage.setItem("proy", JSON.stringify(nextProjectData));
+                        } else {
+                            localStorage.removeItem("proy");
+                        }
+
+                        return fetch(`http://localhost:3000/proyectos/${projectData.idProyecto}`, {
+                            method: "DELETE",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                        });
+                    })
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error("No se pudo eliminar el proyecto");
+                        }
+                        console.log("Proyecto eliminado con éxito");
+                        location.reload();
+                    })
+                    .catch((error) => console.error("Error al eliminar el proyecto:", error));
+            }
+        });
+    });
 }
 
 
