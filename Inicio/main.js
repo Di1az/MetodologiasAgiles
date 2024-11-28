@@ -23,6 +23,7 @@ function createLoginWindow() {
   loginWindow.loadURL("http://localhost:3001/auth/google");
 }
 
+/*
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -36,6 +37,7 @@ function createMainWindow() {
 
   mainWindow.loadFile("./view/index.html");
 }
+  */
 
 function createProjectWindow() {
   projectWindow = new BrowserWindow({
@@ -84,7 +86,7 @@ function createEditProjectWindow(projectData) {
   });
 }
 
-function openProjectViewWindow(projectData) {
+function createMainWindow(projectData) {
   projectViewWindow = new BrowserWindow({
     width: 1920,
     height: 1080,
@@ -98,9 +100,11 @@ function openProjectViewWindow(projectData) {
   projectViewWindow.loadFile("./view/project-view.html");
   projectViewWindow.center();
 
+  
   projectViewWindow.webContents.on("did-finish-load", () => {
     projectViewWindow.webContents.send("load-project", projectData);
   });
+
 
   // Evento para manejar el cierre de projectViewWindow
   projectViewWindow.on("closed", () => {
@@ -153,18 +157,52 @@ ipcMain.on("open-edit-project-window", (event, projectData) => {
 
 ipcMain.on("open-project-view", (event, projectData) => {
   if (!projectViewWindow) {
-    openProjectViewWindow(projectData);
+    createMainWindow(projectData);
   }
 });
 
+/*
 ipcMain.on("add-project", (event, projectData) => {
+  if (mainWindow && mainWindow.webContents) {
   mainWindow.webContents.send("new-project", projectData);
-  projectWindow.close();
+  }else{
+    console.error("main window no esta inicializado")
+  }
+  if(projectWindow) projectWindow.close();
+});
+*/
+
+ipcMain.on("add-project", (event, projectData) => {
+  console.log("Recibiendo datos para agregar un proyecto:", projectData);
+  
+  // Llamar a la función para agregar el proyecto
+  addProject(projectData)
+    .then(() => {
+      console.log("Proyecto agregado con éxito");
+      
+      // Notificar a la ventana principal (si es necesario)
+      if (mainWindow && mainWindow.webContents) {
+        mainWindow.webContents.send("new-project", projectData);
+      } else {
+        console.error("mainWindow no está inicializado");
+      }
+      
+      // Cerrar la ventana de creación del proyecto
+      if (projectWindow) {
+        projectWindow.close();
+      }
+    })
+    .catch((error) => {
+      console.error("Error al agregar el proyecto:", error);
+    });
 });
 
 ipcMain.on("update-project", (event, updatedProjectData) => {
-  mainWindow.webContents.send("project-updated", updatedProjectData);
-  editProjectWindow.close();
+  if (editProjectWindow && editProjectWindow.webContents) {
+    editProjectWindow.webContents.send("project-updated", updatedProjectData);
+} else {
+    console.error("editProjectWindow no está inicializada.");
+}  editProjectWindow.close();
 });
 
 app.on("window-all-closed", () => {
@@ -191,7 +229,7 @@ app.whenReady().then(() => {
 
   ipcMain.on("login-success", () => {
     if (loginWindow) loginWindow.close(); // Close login window
-    createMainWindow(); // Open main window after login
+    if (!mainWindow) createMainWindow(); // Open main window after login
   });
 });
 
@@ -219,5 +257,57 @@ function deleteProject(projectData) {
     console.error("Error:", error);
   });
 }
+
+// Función para agregar el proyecto a la API
+function addProject(projectData) {
+  return fetch("http://localhost:3000/proyectos", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      nombre: projectData.name,
+      descripcion: projectData.description,
+      fecha_inicio: projectData.startDate,
+      fecha_termino: projectData.endDate,
+    }),
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error("Fallo al agregar el proyecto");
+    }
+    return response.json();
+  });
+}
+
+ipcMain.on("update-project-request", async (event, updatedProjectData) => {
+  try {
+      const response = await fetch(`http://localhost:3000/proyectos/${updatedProjectData.idProyecto}`, {
+          method: "PUT",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+              nombre: updatedProjectData.name,
+              descripcion: updatedProjectData.description,
+              fecha_inicio: updatedProjectData.startDate,
+              fecha_termino: updatedProjectData.endDate,
+          }),
+      });
+
+      if (!response.ok) {
+          throw new Error("Error al actualizar el proyecto");
+      }
+
+      const result = await response.json();
+
+      // Enviar confirmación al renderer
+      event.sender.send("update-project-success", result);
+  } catch (error) {
+      console.error("Error al actualizar el proyecto:", error);
+      event.sender.send("update-project-failure", error.message);
+  }
+});
+
+
 
 

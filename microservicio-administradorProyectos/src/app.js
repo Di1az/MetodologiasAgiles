@@ -48,6 +48,9 @@ app.post('/proyectos', async (req, res) => {
 app.put('/proyectos/:id', async (req, res) => {
     const { id } = req.params;
     const { nombre, descripcion, fecha_inicio, fecha_termino } = req.body;
+
+    console.log("Datos recibidos para actualizar:", { id, nombre, descripcion, fecha_inicio, fecha_termino });
+
     try {
         const [result] = await db.query(
             'UPDATE Proyecto SET nombre = ?, descripcion = ?, fecha_inicio = ?, fecha_termino = ? WHERE id_proyecto = ?',

@@ -13,6 +13,8 @@ function loadActivities(projectData) {
 
     console.log(projectData.idProyecto);
 
+    renderProjectDetails(projectData);
+
     // Obtener actividades específicas para este proyecto desde la API
     fetch(`http://localhost:3000/actividades?project_id=${projectData.idProyecto}`)
         .then((response) => response.json())
@@ -125,11 +127,26 @@ function loadActivities(projectData) {
         })
         .catch((error) => console.error("Error al obtener actividades:", error));
 
-    document.getElementById("edit-btn").addEventListener("click", () => {
-        ipcRenderer.send("open-edit-project-window", projectData);
-    });
+        // **Reasignar eventos a los botones para evitar duplicados**
+        const editBtn = document.getElementById("edit-btn");
+        const newProjectBtn = document.getElementById("newProjectBtn");
 
-    document.getElementById("delete-btn").addEventListener("click", () => {
+        // Eliminar eventos previos con replaceWith
+        editBtn.replaceWith(editBtn.cloneNode(true));
+        newProjectBtn.replaceWith(newProjectBtn.cloneNode(true));
+
+        // Reasignar eventos únicos
+        document.getElementById("edit-btn").addEventListener("click", () => {
+        console.log("Edit project button clicked");
+        ipcRenderer.send("open-edit-project-window", projectData);
+        });
+
+        document.getElementById("newProjectBtn").addEventListener("click", () => {
+        console.log("New project button clicked");
+        ipcRenderer.send("open-new-project-window");
+        });
+
+        document.getElementById("delete-btn").addEventListener("click", () => {
         const deleteButton = document.getElementById("delete-btn");
         const newDeleteButton = deleteButton.cloneNode(true);
         deleteButton.replaceWith(newDeleteButton);
@@ -181,10 +198,6 @@ function loadActivities(projectData) {
         });
     });
 
-    // Abrir ventana para agregar nuevo proyecto
-    document.getElementById("newProjectBtn").addEventListener("click", () => {
-        ipcRenderer.send("open-new-project-window");
-    });
 }
 
 
@@ -195,17 +208,17 @@ ipcRenderer.on("load-project", (event) => {
     console.log("cargo")
     // Agregar eventos para botones de añadir actividad por columna
     document.getElementById("add-act-btn-por-hacer").addEventListener("click", () => {
-        ipcRenderer.send("new-activity", { estado: "Por hacer", project_id: projectData.idProyecto });
+        const currentProject = JSON.parse(localStorage.getItem("proy"));
+        ipcRenderer.send("new-activity", { estado: "Por hacer", project_id: currentProject.idProyecto });
     });
     document.getElementById("add-act-btn-en-curso").addEventListener("click", () => {
-        ipcRenderer.send("new-activity", { estado: "En curso", project_id: projectData.idProyecto });
+        const currentProject = JSON.parse(localStorage.getItem("proy"));
+        ipcRenderer.send("new-activity", { estado: "En curso", project_id: currentProject.idProyecto });
     });
     document.getElementById("add-act-btn-terminada").addEventListener("click", () => {
-        ipcRenderer.send("new-activity", { estado: "Terminada", project_id: projectData.idProyecto });
+        const currentProject = JSON.parse(localStorage.getItem("proy"));
+        ipcRenderer.send("new-activity", { estado: "Terminada", project_id: currentProject.idProyecto });
     });
-
-
-
 
     //FETCH TO LOAD ALL PROYECTS
     fetch("http://localhost:3000/proyectos", {
@@ -299,8 +312,36 @@ function renderSelectedProy(idProyecto) {
     } else {
         console.log("No element found with the specified data-id");
     }
-
-
-
-
 }
+
+function renderProjectDetails(projectData) {
+    const projectDetailsColumn = document.querySelector(".project-details-column");
+
+    if (projectDetailsColumn) {
+        projectDetailsColumn.innerHTML = `
+            <div class="project-description">
+                <h3>Detalles del proyecto</h3>
+                <p><strong>Descripción: </strong>${projectData.description}</p>
+            </div>
+            <div class="project-dates">
+                <p><strong>Inicio:</strong> ${formatDate(projectData.startDate)}</p>
+                <p><strong>Fin:</strong> ${formatDate(projectData.endDate)}</p>
+            </div>
+        `;
+    }
+}
+
+function formatDate(isoDate) {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+}
+
+
+
+
+
+

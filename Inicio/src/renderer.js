@@ -30,10 +30,6 @@ ipcRenderer.on("new-project", (event, projectData) => {
     })
     .then((data) => {
       console.log("Proyecto creado:", data);
-      // crear card después de crear proyecto
-      const projectContainer = document.getElementById("projectsContainer");
-      const projectCard = createProjectCard(projectData, data);
-      projectContainer.appendChild(projectCard);
     })
     .catch((error) => {
       console.error("Error:", error);

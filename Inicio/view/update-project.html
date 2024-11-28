@@ -8,18 +8,19 @@
 </head>
 <body>
   <h1>Actualizar Proyecto</h1>
-  <form id="update-project-form">
+  <form id="edit-form">
     <label for="nombre">Nombre del Proyecto:</label>
-    <input type="text" id="nombre" name="nombre" readonly required>
+    <input type="text" id="project-name" name="nombre" required>
+    <!--readonly-->
 
     <label for="descripcion">Descripción:</label>
-    <textarea id="descripcion" name="descripcion"></textarea>
+    <textarea id="project-description" name="descripcion"></textarea>
 
     <label for="fecha_inicio">Fecha de Inicio:</label>
-    <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+    <input type="date" id="project-start-date" name="fecha_inicio" required>
 
     <label for="fecha_termino">Fecha de Término:</label>
-    <input type="date" id="fecha_termino" name="fecha_termino">
+    <input type="date" id="project-end-date" name="fecha_termino">
 
     <button type="submit">Actualizar</button>
   </form>
