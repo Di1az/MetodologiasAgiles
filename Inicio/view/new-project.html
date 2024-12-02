@@ -27,26 +27,7 @@
       <button type="submit">Guardar Proyecto</button>
     </div>
   </form>
-
-  <script>
-    const { ipcRenderer } = require('electron');
-
-    // Guardar el proyecto con descripción y fechas
-    document.getElementById('projectForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const projectData = {
-        name: document.getElementById('name').value,
-        description: document.getElementById('description').value,
-        startDate: document.getElementById('startDate').value,
-        endDate: document.getElementById('endDate').value
-      };
-      ipcRenderer.send('add-project', projectData);
-    });
-
-    // Botón de cerrar
-    document.getElementById('closeBtn').addEventListener('click', () => {
-      ipcRenderer.send('close-window');
-    });
-  </script>
+  <div id="errorMessages" style="color: red; font-size: 14px; margin-top: 10px;"></div>
+  <script src="../src/renderer-new-project.js">  </script>
 </body>
 </html>

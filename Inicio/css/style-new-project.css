@@ -71,6 +71,13 @@ button:hover {
   margin-top: 20px;
 }
 
+#errorMessages {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center; /* Centra el texto horizontalmente */
+}
+
   
   
   

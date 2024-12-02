@@ -23,21 +23,6 @@ function createLoginWindow() {
   loginWindow.loadURL("http://localhost:3001/auth/google");
 }
 
-/*
-function createMainWindow() {
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
-  });
-
-  mainWindow.loadFile("./view/index.html");
-}
-  */
 
 function createProjectWindow() {
   projectWindow = new BrowserWindow({
@@ -54,14 +39,6 @@ function createProjectWindow() {
 
   projectWindow.loadFile("./view/new-project.html");
 }
-
-// app.whenReady().then(() => {
-//   createMainWindow();
-
-//   app.on('activate', () => {
-//     if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
-//   });
-// });
 
 function createEditProjectWindow(projectData) {
   editProjectWindow = new BrowserWindow({
@@ -96,13 +73,13 @@ function createMainWindow(projectData) {
       contextIsolation: false,
     },
   });
-
+  
   projectViewWindow.loadFile("./view/project-view.html");
   projectViewWindow.center();
 
-  
   projectViewWindow.webContents.on("did-finish-load", () => {
-    projectViewWindow.webContents.send("load-project", projectData);
+  projectViewWindow.webContents.send("load-project", projectData);
+
   });
 
 
@@ -161,17 +138,6 @@ ipcMain.on("open-project-view", (event, projectData) => {
   }
 });
 
-/*
-ipcMain.on("add-project", (event, projectData) => {
-  if (mainWindow && mainWindow.webContents) {
-  mainWindow.webContents.send("new-project", projectData);
-  }else{
-    console.error("main window no esta inicializado")
-  }
-  if(projectWindow) projectWindow.close();
-});
-*/
-
 ipcMain.on("add-project", (event, projectData) => {
   console.log("Recibiendo datos para agregar un proyecto:", projectData);
   
@@ -224,12 +190,22 @@ ipcMain.on("save-activity", (event, activityData) => {
 });
 
 //LOGIN SUCCES
+/*
 app.whenReady().then(() => {
   createLoginWindow();
 
   ipcMain.on("login-success", () => {
-    if (loginWindow) loginWindow.close(); // Close login window
-    if (!mainWindow) createMainWindow(); // Open main window after login
+    if (loginWindow) loginWindow.close(); 
+    if (!mainWindow) createMainWindow(); 
+  });
+});
+*/
+
+app.whenReady().then(() => {
+  createMainWindow();
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
   });
 });
 
@@ -305,6 +281,15 @@ ipcMain.on("update-project-request", async (event, updatedProjectData) => {
   } catch (error) {
       console.error("Error al actualizar el proyecto:", error);
       event.sender.send("update-project-failure", error.message);
+  }
+});
+
+// Escucha el evento para cerrar ventanas
+ipcMain.on("close-window", () => {
+  // Cierra la ventana activa del proyecto si existe
+  if (projectWindow && !projectWindow.isDestroyed()) {
+    projectWindow.close();
+    projectWindow = null;
   }
 });
 
