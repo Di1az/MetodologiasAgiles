@@ -27,7 +27,7 @@ function createLoginWindow() {
 function createProjectWindow() {
   projectWindow = new BrowserWindow({
     width: 800,
-    height: 600,
+    height: 800,
     parent: mainWindow,
     modal: true,
     webPreferences: {
@@ -43,7 +43,7 @@ function createProjectWindow() {
 function createEditProjectWindow(projectData) {
   editProjectWindow = new BrowserWindow({
     width: 800,
-    height: 600,
+    height: 650,
     parent: mainWindow,
     modal: true,
     webPreferences: {
@@ -292,6 +292,14 @@ ipcMain.on("close-window", () => {
     projectWindow = null;
   }
 });
+
+ipcMain.on('close-window', () => {
+  if (editProjectWindow && !editProjectWindow.isDestroyed()) {
+    editProjectWindow.close();
+    editProjectWindow = null;
+  }
+});
+
 
 
 

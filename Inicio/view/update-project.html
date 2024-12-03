@@ -7,11 +7,10 @@
   <link rel="stylesheet" href="../css/style-update-project.css">
 </head>
 <body>
-  <h1>Actualizar Proyecto</h1>
+  <h2>Actualizar Proyecto</h2>
   <form id="edit-form">
     <label for="nombre">Nombre del Proyecto:</label>
     <input type="text" id="project-name" name="nombre" required>
-    <!--readonly-->
 
     <label for="descripcion">Descripción:</label>
     <textarea id="project-description" name="descripcion"></textarea>
@@ -22,9 +21,12 @@
     <label for="fecha_termino">Fecha de Término:</label>
     <input type="date" id="project-end-date" name="fecha_termino">
 
-    <button type="submit">Actualizar</button>
-  </form>
+    <div id="errorMessages"></div>
 
+    <div class="button-group">
+      <button type="button" id="closeBtn">Cerrar</button>
+      <button type="submit">Actualizar</button>
+  </form>
   <script src="../src/renderer-update.js"></script>
   
 </body>
