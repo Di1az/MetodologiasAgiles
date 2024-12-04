@@ -243,6 +243,28 @@ ipcRenderer.on("load-project", (event) => {
         });
 });
 
+function obtenerTrabajadores(projectData) {
+    fetch(`http://localhost:3000/proyectos/trabajador/${projectData.idTrabajador}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Error al obtener los proyectos del trabajador");
+            }
+            return response.json();
+        })
+        .then((data) => {
+            console.log("Proyectos obtenidos:", data);
+            renderProjects(data, projectData.idProyecto);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+
 // Function to render the projects
 function renderProjects(projects, idSelected) {
     const projectList = document.getElementById("proy-list");

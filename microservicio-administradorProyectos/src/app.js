@@ -63,6 +63,27 @@ app.put('/proyectos/:id', async (req, res) => {
     }
 });
 
+// Get all projects where a worker is involved in any activity
+app.get('/proyectos/trabajador/:id_trabajador', async (req, res) => {
+    const { id_trabajador } = req.params;
+    try {
+        const [rows] = await db.query(
+            `SELECT DISTINCT p.* 
+             FROM Proyecto p
+             JOIN Actividad a ON p.id_proyecto = a.id_proyecto
+             WHERE a.id_responsable = ?`,
+            [id_trabajador]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron proyectos para este trabajador.' });
+        }
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Delete a project by ID
 app.delete('/proyectos/:id', async (req, res) => {
     const { id } = req.params;
