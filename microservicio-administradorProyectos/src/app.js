@@ -184,13 +184,13 @@ app.get('/trabajadores', async (req, res) => {
 
 // Create a new worker
 app.post('/trabajadores', async (req, res) => {
-    const { nombre_trabajador } = req.body;
+    const { nombre_trabajador,email_trabajador, is_admin } = req.body;
     try {
         const [result] = await db.query(
-            'INSERT INTO Trabajador (nombre_trabajador) VALUES (?)',
-            [nombre_trabajador]
+            'INSERT INTO Trabajador (nombre_trabajador, email_trabajador, is_admin) VALUES (?, ?, ?)',
+            [nombre_trabajador,email_trabajador, is_admin]
         );
-        res.status(201).json({ id_trabajador: result.insertId });
+        res.status(201).json({ email_trabajador: result.email_trabajador });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

@@ -190,7 +190,7 @@ ipcMain.on("save-activity", (event, activityData) => {
 });
 
 //LOGIN SUCCES
-/*
+
 app.whenReady().then(() => {
   createLoginWindow();
 
@@ -199,8 +199,8 @@ app.whenReady().then(() => {
     if (!mainWindow) createMainWindow(); 
   });
 });
-*/
 
+/*
 app.whenReady().then(() => {
   createMainWindow();
 
@@ -208,7 +208,7 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
   });
 });
-
+*/
 
 function deleteProject(projectData) {
   fetch(`http://localhost:3000/proyectos/${projectData}`, {
