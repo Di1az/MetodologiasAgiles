@@ -92,7 +92,7 @@ function createMainWindow(projectData) {
 function openNewActivityWindow(data) {
   newActivity = new BrowserWindow({
     width: 800,
-    height: 600,
+    height: 800,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: true,
@@ -297,6 +297,13 @@ ipcMain.on('close-window', () => {
   if (editProjectWindow && !editProjectWindow.isDestroyed()) {
     editProjectWindow.close();
     editProjectWindow = null;
+  }
+});
+
+ipcMain.on('close-window', () => {
+  if (newActivity && !newActivity.isDestroyed()) {
+    newActivity.close();
+    newActivity = null;
   }
 });
 
