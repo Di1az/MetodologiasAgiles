@@ -4,10 +4,10 @@ import mysql from 'mysql2';
 dotenv.config();
 
 const pool = mysql.createPool({
-  host: "localhost",
-  user: "admin",
-  password: "1234",
-  database: "gestion_proyectos2"
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
 
 

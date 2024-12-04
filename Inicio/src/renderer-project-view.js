@@ -77,8 +77,49 @@ function loadActivities(projectData) {
 
                         console.log(`Activity moved to state: ${newState}`);
                         // Optionally, update the DOM or reload activities
+                        
+                        // Actualizar estado local
+                        activity.estado = newState;
+
+                        // Mover el elemento al contenedor correspondiente
+                        const currentCard = btnBackAct.closest(".activity-card");
+                        if (newState === "Por hacer") {
+                        document.querySelector(".activity-column:nth-child(1)").appendChild(currentCard);
+                        } else if (newState === "En curso") {
+                        document.querySelector(".activity-column:nth-child(2)").appendChild(currentCard);
+                        }
+
                     } catch (error) {
                         console.error("Failed to move activity back:", error);
+                    }
+                });
+
+                const btnDeleteAct = document.createElement("button");
+                btnDeleteAct.className = "btn-delete-act";
+                btnDeleteAct.textContent = "-";
+
+                btnDeleteAct.addEventListener("click", async () => {
+                    if (confirm("¿Estás seguro de que quieres eliminar esta actividad?")) {
+                        try {
+                            const response = await fetch(
+                                `http://localhost:3000/actividades/${activity.id_actividad}`,
+                                {
+                                    method: "DELETE",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                }
+                            );
+            
+                            if (!response.ok) {
+                                throw new Error("Error deleting activity");
+                            }
+            
+                            console.log("Activity deleted successfully");
+                            activityCard.remove(); // Eliminar del DOM
+                        } catch (error) {
+                            console.error("Failed to delete activity:", error);
+                        }
                     }
                 });
 
@@ -108,6 +149,18 @@ function loadActivities(projectData) {
 
                         console.log(`Activity moved to state: ${newState}`);
                         // Optionally, update the DOM or reload activities
+
+                        // Actualizar estado local
+                        activity.estado = newState;
+
+                        // Mover el elemento al contenedor correspondiente
+                        const currentCard = btnForwAct.closest(".activity-card");
+                        if (newState === "En curso") {
+                        document.querySelector(".activity-column:nth-child(2)").appendChild(currentCard);
+                        } else if (newState === "Terminada") {
+                        document.querySelector(".activity-column:nth-child(3)").appendChild(currentCard);
+                        }
+
                     } catch (error) {
                         console.error("Failed to move activity forward:", error);
                     }
@@ -116,6 +169,7 @@ function loadActivities(projectData) {
                 console.log(btnForwAct.className);
                 activityCard.appendChild(text);
                 activityCard.appendChild(btnBackAct);
+                activityCard.appendChild(btnDeleteAct); 
                 activityCard.appendChild(btnForwAct);
 
                 activityCard.classList.add("activity-card");
