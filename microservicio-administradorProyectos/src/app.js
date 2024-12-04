@@ -66,6 +66,8 @@ app.put('/proyectos/:id', async (req, res) => {
 // Get all projects where a worker is involved in any activity
 app.get('/proyectos/trabajador/:id_trabajador', async (req, res) => {
     const { id_trabajador } = req.params;
+    console.log("BASE");
+    console.log(id_trabajador);
     try {
         const [rows] = await db.query(
             `SELECT DISTINCT p.* 
@@ -205,11 +207,11 @@ app.get('/trabajadores', async (req, res) => {
 
 // Create a new worker
 app.post('/trabajadores', async (req, res) => {
-    const { nombre_trabajador,email_trabajador, is_admin } = req.body;
+    const { nombre_trabajador, email_trabajador, is_admin } = req.body;
     try {
         const [result] = await db.query(
             'INSERT INTO Trabajador (nombre_trabajador, email_trabajador, is_admin) VALUES (?, ?, ?)',
-            [nombre_trabajador,email_trabajador, is_admin]
+            [nombre_trabajador, email_trabajador, is_admin]
         );
         res.status(201).json({ id_trabajador: result.insertId });
     } catch (error) {
@@ -231,6 +233,32 @@ app.get('/trabajadores/:email', async (req, res) => {
         }
 
         res.status(200).json(rows[0]); // Return the worker's information
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update the 'is_admin' field for a worker by their ID
+app.put('/trabajadores/:id', async (req, res) => {
+    const { id } = req.params;
+    const { is_admin } = req.body; // Assuming the request body contains the 'is_admin' field
+
+    if (typeof is_admin !== 'boolean') {
+        return res.status(400).json({ error: 'El campo is_admin debe ser un valor booleano' });
+    }
+
+    try {
+        // Update the 'is_admin' field for the specified trabajador
+        const [result] = await db.query(
+            'UPDATE Trabajador SET is_admin = ? WHERE id = ?',
+            [is_admin, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Trabajador no encontrado' });
+        }
+
+        res.status(200).json({ message: 'Trabajador actualizado correctamente' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

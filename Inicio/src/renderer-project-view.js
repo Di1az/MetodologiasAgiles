@@ -1,8 +1,12 @@
+const fs = require('fs');
+
 const { ipcRenderer } = require("electron");
 
 window.onload = function () {
     document.getElementById("delete-btn").removeAttribute('click');
 };
+
+let trabajadorData;
 
 // Función para cargar las actividades
 function loadActivities(projectData) {
@@ -38,82 +42,82 @@ function loadActivities(projectData) {
                 const activityCard = document.createElement("div");
                 const text = document.createElement("p");
                 text.textContent = activity.descripcion;
-        
+
                 const btnBackAct = document.createElement("button");
                 btnBackAct.className = "btn-back-act";
                 btnBackAct.textContent = "<";
-        
+
                 btnBackAct.addEventListener("click", async () => {
-                  let newState;
-                  // Determinar el nuevo estado solo si no está en "Por hacer"
-                  if (activity.estado === "En curso") {
-                    newState = "Por hacer";
-                  } else if (activity.estado === "Terminada") {
-                    newState = "En curso";
-                  } else {
-                    console.log("Activity is already in the earliest state: Por hacer");
-                    return; // No hacer nada si ya está en "Por hacer"
-                  }
-        
-                  try {
-                    const response = await fetch(
-                      `http://localhost:3000/actividades/${activity.id_actividad}/cambiarEstado`,
-                      {
-                        method: "PUT",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ nuevoEstado: newState }),
-                      }
-                    );
-        
-                    if (!response.ok) {
-                      throw new Error("Error updating activity");
+                    let newState;
+                    // Determinar el nuevo estado solo si no está en "Por hacer"
+                    if (activity.estado === "En curso") {
+                        newState = "Por hacer";
+                    } else if (activity.estado === "Terminada") {
+                        newState = "En curso";
+                    } else {
+                        console.log("Activity is already in the earliest state: Por hacer");
+                        return; // No hacer nada si ya está en "Por hacer"
                     }
-        
-                    console.log(`Activity moved to state: ${newState}`);
-                    // Optionally, update the DOM or reload activities
-                  } catch (error) {
-                    console.error("Failed to move activity back:", error);
-                  }
+
+                    try {
+                        const response = await fetch(
+                            `http://localhost:3000/actividades/${activity.id_actividad}/cambiarEstado`,
+                            {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ nuevoEstado: newState }),
+                            }
+                        );
+
+                        if (!response.ok) {
+                            throw new Error("Error updating activity");
+                        }
+
+                        console.log(`Activity moved to state: ${newState}`);
+                        // Optionally, update the DOM or reload activities
+                    } catch (error) {
+                        console.error("Failed to move activity back:", error);
+                    }
                 });
-        
+
                 const btnForwAct = document.createElement("button");
                 btnForwAct.className = "btn-forw-act";
                 btnForwAct.textContent = ">";
-        
+
                 btnForwAct.addEventListener("click", async () => {
-                  const newState =
-                    activity.estado === "Por hacer" ? "En curso" : "Terminada";
-        
-                  try {
-                    const response = await fetch(
-                      `http://localhost:3000/actividades/${activity.id_actividad}/cambiarEstado`,
-                      {
-                        method: "PUT",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ nuevoEstado: newState }),
-                      }
-                    );
-        
-                    if (!response.ok) {
-                      throw new Error("Error updating activity");
+                    const newState =
+                        activity.estado === "Por hacer" ? "En curso" : "Terminada";
+
+                    try {
+                        const response = await fetch(
+                            `http://localhost:3000/actividades/${activity.id_actividad}/cambiarEstado`,
+                            {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ nuevoEstado: newState }),
+                            }
+                        );
+
+                        if (!response.ok) {
+                            throw new Error("Error updating activity");
+                        }
+
+                        console.log(`Activity moved to state: ${newState}`);
+                        // Optionally, update the DOM or reload activities
+                    } catch (error) {
+                        console.error("Failed to move activity forward:", error);
                     }
-        
-                    console.log(`Activity moved to state: ${newState}`);
-                    // Optionally, update the DOM or reload activities
-                  } catch (error) {
-                    console.error("Failed to move activity forward:", error);
-                  }
                 });
-        
+
                 console.log(btnForwAct.className);
                 activityCard.appendChild(text);
                 activityCard.appendChild(btnBackAct);
                 activityCard.appendChild(btnForwAct);
-        
+
                 activityCard.classList.add("activity-card");
 
                 if (activity.estado === "Por hacer") {
@@ -127,26 +131,26 @@ function loadActivities(projectData) {
         })
         .catch((error) => console.error("Error al obtener actividades:", error));
 
-        // **Reasignar eventos a los botones para evitar duplicados**
-        const editBtn = document.getElementById("edit-btn");
-        const newProjectBtn = document.getElementById("newProjectBtn");
+    // **Reasignar eventos a los botones para evitar duplicados**
+    const editBtn = document.getElementById("edit-btn");
+    const newProjectBtn = document.getElementById("newProjectBtn");
 
-        // Eliminar eventos previos con replaceWith
-        editBtn.replaceWith(editBtn.cloneNode(true));
-        newProjectBtn.replaceWith(newProjectBtn.cloneNode(true));
+    // Eliminar eventos previos con replaceWith
+    editBtn.replaceWith(editBtn.cloneNode(true));
+    newProjectBtn.replaceWith(newProjectBtn.cloneNode(true));
 
-        // Reasignar eventos únicos
-        document.getElementById("edit-btn").addEventListener("click", () => {
+    // Reasignar eventos únicos
+    document.getElementById("edit-btn").addEventListener("click", () => {
         console.log("Edit project button clicked");
         ipcRenderer.send("open-edit-project-window", projectData);
-        });
+    });
 
-        document.getElementById("newProjectBtn").addEventListener("click", () => {
+    document.getElementById("newProjectBtn").addEventListener("click", () => {
         console.log("New project button clicked");
         ipcRenderer.send("open-new-project-window");
-        });
+    });
 
-        document.getElementById("delete-btn").addEventListener("click", () => {
+    document.getElementById("delete-btn").addEventListener("click", () => {
         const deleteButton = document.getElementById("delete-btn");
         const newDeleteButton = deleteButton.cloneNode(true);
         deleteButton.replaceWith(newDeleteButton);
@@ -205,6 +209,7 @@ function loadActivities(projectData) {
 ipcRenderer.on("load-project", (event) => {
     const projectData = JSON.parse(localStorage.getItem("proy"));
     loadActivities(projectData);
+
     console.log("cargo")
     // Agregar eventos para botones de añadir actividad por columna
     document.getElementById("add-act-btn-por-hacer").addEventListener("click", () => {
@@ -220,6 +225,30 @@ ipcRenderer.on("load-project", (event) => {
         ipcRenderer.send("new-activity", { estado: "Terminada", project_id: currentProject.idProyecto });
     });
 
+    let parsedData;
+
+    fs.readFile('src/datos.json', 'utf8', (err, data) => {
+        if (err) {
+            console.error('Error al leer el archivo:', err);
+        } else {
+            try {
+                parsedData = JSON.parse(data);
+                console.log('Datos leídos del archivo:', parsedData);
+                if (parsedData.admin == 1) {
+                    obtenerTodosProyectos();
+                } else {
+                    obtenerTrabajadores(parsedData.id);
+                }
+
+            } catch (parseError) {
+                console.error('Error al parsear el archivo JSON:', parseError);
+            }
+        }
+    });
+
+});
+function obtenerTodosProyectos() {
+    const projectData = JSON.parse(localStorage.getItem("proy"));
     //FETCH TO LOAD ALL PROYECTS
     fetch("http://localhost:3000/proyectos", {
         method: "GET",
@@ -241,10 +270,11 @@ ipcRenderer.on("load-project", (event) => {
         .catch((error) => {
             console.error("Error:", error);
         });
-});
+}
 
-function obtenerTrabajadores(projectData) {
-    fetch(`http://localhost:3000/proyectos/trabajador/${projectData.idTrabajador}`, {
+function obtenerTrabajadores(trabajadorData) {
+    const projectData = JSON.parse(localStorage.getItem("proy"));
+    fetch(`http://localhost:3000/proyectos/trabajador/${trabajadorData}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

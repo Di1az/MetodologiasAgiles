@@ -3,6 +3,7 @@ const session = require("express-session");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const dotenv = require("dotenv");
+const fs = require('fs');
 
 dotenv.config();
 const app = express();
@@ -61,7 +62,7 @@ const addTrabajador = async (displayName, email) => {
 
     const data = await response.json();
     console.log("Trabajador added successfully:", data.id_trabajador);
-    return data.id_trabajador;
+    return {id: data.id_trabajador, admin: false};
   } catch (error) {
     console.error("Cannot add trabajador:", error.message);
     console.log("fetching worker email");
@@ -89,7 +90,15 @@ const getTrabajadorByEmail = async (email) => {
 
         const trabajador = await response.json();
         console.log('Trabajador encontrado:', trabajador);
-        return trabajador.id;
+        const trabajadorData = { id: trabajador.id, admin: trabajador.is_admin };
+        fs.writeFile('datos.json', JSON.stringify(trabajadorData, null, 2), (err) => {
+          if (err) {
+            console.error('Error al escribir el archivo:', err);
+          } else {
+            console.log('Archivo JSON guardado correctamente');
+          }
+        });
+        return trabajadorData;
     } catch (error) {
         console.error('Error al obtener trabajador:', error.message);
     }
