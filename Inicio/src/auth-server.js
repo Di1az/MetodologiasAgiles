@@ -34,7 +34,7 @@ passport.use(
       console.log(profile.displayName);
 
       //Añade al trabajador
-        addTrabajador(profile.displayName, profile.emails[0].value)
+      addTrabajador(profile.displayName, profile.emails[0].value);
 
       return done(null, profile);
     }
@@ -60,10 +60,39 @@ const addTrabajador = async (displayName, email) => {
     }
 
     const data = await response.json();
-    console.log("Trabajador added successfully");
+    console.log("Trabajador added successfully:", data.id_trabajador);
+    return data.id_trabajador;
   } catch (error) {
-    console.error("Error adding trabajador:", error.message);
+    console.error("Cannot add trabajador:", error.message);
+    console.log("fetching worker email");
+    return await getTrabajadorByEmail(email);
   }
+};
+
+
+
+
+const getTrabajadorByEmail = async (email) => {
+    const url = `http://localhost:3000/trabajadores/${email}`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} - Trabajador no encontrado o error en el servidor.`);
+        }
+
+        const trabajador = await response.json();
+        console.log('Trabajador encontrado:', trabajador);
+        return trabajador.id;
+    } catch (error) {
+        console.error('Error al obtener trabajador:', error.message);
+    }
 };
 
 passport.serializeUser((user, done) => {

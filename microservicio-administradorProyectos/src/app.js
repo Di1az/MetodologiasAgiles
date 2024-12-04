@@ -190,7 +190,26 @@ app.post('/trabajadores', async (req, res) => {
             'INSERT INTO Trabajador (nombre_trabajador, email_trabajador, is_admin) VALUES (?, ?, ?)',
             [nombre_trabajador,email_trabajador, is_admin]
         );
-        res.status(201).json({ email_trabajador: result.email_trabajador });
+        res.status(201).json({ id_trabajador: result.insertId });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Fetch a worker by email
+app.get('/trabajadores/:email', async (req, res) => {
+    const { email } = req.params;
+    try {
+        const [rows] = await db.query(
+            'SELECT id, nombre_trabajador, email_trabajador, is_admin FROM Trabajador WHERE email_trabajador = ?',
+            [email]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Trabajador no encontrado' });
+        }
+
+        res.status(200).json(rows[0]); // Return the worker's information
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
