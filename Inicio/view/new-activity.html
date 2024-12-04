@@ -1,45 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nuevo Proyecto</title>
-  <link rel="stylesheet" href="../css/style-new-project.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nuevo Proyecto</title>
+    <link rel="stylesheet" href="../css/style-new-project.css" />
+  </head>
+  <body>
     <h2>Agregar Nueva Actividad</h2>
     <form id="actForm">
       <label for="descripcion">Descripción de la Actividad:</label>
-      <input type="text" id="descripcion" required><br>
-  
+      <input type="text" id="descripcion" required /><br />
+
       <label for="status">Estado:</label>
       <select id="status" required>
         <option value="" disabled selected>Seleccione un estado</option>
         <option value="Por hacer">Por hacer</option>
         <option value="En curso">En curso</option>
-        <option value="Terminada">Terminada</option>
-      </select><br><br>
-  
+        <option value="Terminada">Terminada</option></select
+      ><br /><br />
+
       <label for="cost">Costo:</label>
-      <input type="number" id="cost" required><br>
-  
+      <input type="number" id="cost" required /><br />
+
       <label for="startDate">Fecha de Inicio:</label>
-      <input type="date" id="startDate" required><br><br>
-  
+      <input type="date" id="startDate" required /><br /><br />
+
       <label for="endDate">Fecha Final:</label>
-      <input type="date" id="endDate" required><br><br>
-  
+      <input type="date" id="endDate" required /><br /><br />
+
       <!-- luego cambiamos por una consulta sobre los trabajadores -->
-      <label for="responsibleId">ID del Responsable:</label>
-      <input type="text" id="responsibleId" required><br><br>
-  
+      <label for="responsibleId">Nombre del Responsable:</label>
+      <select id="responsibleId" required>
+        <option value="" disabled selected>
+          Seleccione un responsable
+        </option></select
+      ><br /><br />
+
       <!-- Botones alineados -->
       <div class="button-group">
         <button type="button" id="closeBtn">Cerrar</button>
         <button type="submit">Guardar Actividad</button>
       </div>
     </form>
-    <div id="errorMessages" style="color: red; font-size: 14px; margin-top: 10px;"></div>
+    <div
+      id="errorMessages"
+      style="color: red; font-size: 14px; margin-top: 10px"
+    ></div>
     <script src="../src/renderer-add-act.js"></script>
-</body>
+  </body>
 </html>

@@ -11,7 +11,32 @@ ipcRenderer.on("load-state", (event, data) => {
     console.log("le puse el estado", data.estado);
     console.log("id", data.project_id);
     select.value = data.estado;
+    loadTrabajadores();
   }
+
+  async function loadTrabajadores() {
+    try {
+      const response = await fetch('http://localhost:3000/trabajadores'); // Adjust endpoint as needed
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const trabajadores = await response.json();
+      const comboBox = document.getElementById('responsibleId');
+
+      // Populate the combo box
+      trabajadores.forEach(trabajador => {
+        const option = document.createElement('option');
+        option.value = trabajador.id;
+        option.textContent = `${trabajador.nombre_trabajador} (${trabajador.email_trabajador})`;
+        comboBox.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Error loading trabajadores:', error.message);
+    }
+  }
+
 
   document.getElementById("actForm").addEventListener("submit", (event) => {
     event.preventDefault();
@@ -28,6 +53,8 @@ ipcRenderer.on("load-state", (event, data) => {
     });
     */
     
+    
+
     // Capturar valores de los campos
     const descripcion = document.getElementById("descripcion").value.trim();
     const estado = document.getElementById("status").value;
