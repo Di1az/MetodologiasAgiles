@@ -12,12 +12,34 @@ let trabajadorData;
 function loadActivities(projectData) {
     console.log(projectData, "data del proyecto");
 
+     // Primero, obtenemos la información del proyecto desde el localStorage
+     const projectDataFromStorage = JSON.parse(localStorage.getItem("proy"));
+     console.log(projectDataFromStorage, "data del proyecto");
+
     // Actualizar título del proyecto
     document.getElementById("title-project").textContent = projectData.name;
 
     console.log(projectData.idProyecto);
 
-    renderProjectDetails(projectData);
+    //renderProjectDetails(projectData);
+
+    fetch(`http://localhost:3000/proyectos/${projectDataFromStorage.idProyecto}`)
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then((projectDetails) => {
+        if (projectDetails) {
+            renderProjectDetails(projectDetails);
+        } else {
+            console.error("Los detalles del proyecto están vacíos o son inválidos.");
+        }
+    })
+    .catch((error) => {
+        console.error("Error al cargar los detalles del proyecto:", error);
+    });
 
     // Obtener actividades específicas para este proyecto desde la API
     fetch(`http://localhost:3000/actividades?project_id=${projectData.idProyecto}`)
@@ -205,6 +227,7 @@ function loadActivities(projectData) {
     });
 
     document.getElementById("delete-btn").addEventListener("click", () => {
+        
         const deleteButton = document.getElementById("delete-btn");
         const newDeleteButton = deleteButton.cloneNode(true);
         deleteButton.replaceWith(newDeleteButton);
@@ -420,21 +443,19 @@ function renderSelectedProy(idProyecto) {
     }
 }
 
-function renderProjectDetails(projectData) {
-    const projectDetailsColumn = document.querySelector(".project-details-column");
+function renderProjectDetails(projectDetails) {
+    const projectDetailsElement = document.getElementById("project-details-column");
 
-    if (projectDetailsColumn) {
-        projectDetailsColumn.innerHTML = `
-            <div class="project-description">
-                <h3>Detalles del proyecto</h3>
-                <p><strong>Descripción: </strong>${projectData.description}</p>
-            </div>
-            <div class="project-dates">
-                <p><strong>Inicio:</strong> ${formatDate(projectData.startDate)}</p>
-                <p><strong>Fin:</strong> ${formatDate(projectData.endDate)}</p>
-            </div>
-        `;
+    if (!projectDetailsElement) {
+        console.error("El elemento con ID 'project-details' no existe en el DOM.");
+        return;
     }
+
+    projectDetailsElement.innerHTML = `
+        <p><strong>Descripción:</strong> ${projectDetails.descripcion}</p>
+        <p><strong>Fecha de inicio:</strong> ${formatDate(projectDetails.fecha_inicio)}</p>
+        <p><strong>Fecha de fin:</strong> ${formatDate(projectDetails.fecha_termino)}</p>
+    `;
 }
 
 function formatDate(isoDate) {
