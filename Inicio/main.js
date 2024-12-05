@@ -211,7 +211,7 @@ app.whenReady().then(() => {
 */
 
 function deleteProject(projectData) {
-  fetch(`http://localhost:3000/proyectos/${projectData}`, {
+  fetch(`http://localhost:89/proyectos/${projectData}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -236,7 +236,7 @@ function deleteProject(projectData) {
 
 // Función para agregar el proyecto a la API
 function addProject(projectData) {
-  return fetch("http://localhost:3000/proyectos", {
+  return fetch("http://localhost:89/proyectos", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -257,7 +257,7 @@ function addProject(projectData) {
 
 ipcMain.on("update-project-request", async (event, updatedProjectData) => {
   try {
-      const response = await fetch(`http://localhost:3000/proyectos/${updatedProjectData.idProyecto}`, {
+      const response = await fetch(`http://localhost:89/proyectos/${updatedProjectData.idProyecto}`, {
           method: "PUT",
           headers: {
               "Content-Type": "application/json",

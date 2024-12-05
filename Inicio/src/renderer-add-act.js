@@ -16,7 +16,7 @@ ipcRenderer.on("load-state", (event, data) => {
 
   async function loadTrabajadores() {
     try {
-      const response = await fetch('http://localhost:3000/trabajadores'); // Adjust endpoint as needed
+      const response = await fetch('http://localhost:89/trabajadores'); // Adjust endpoint as needed
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -119,7 +119,7 @@ ipcRenderer.on("load-state", (event, data) => {
   };
 
     // Validar campos para asegurarse de que los datos son válidos antes de enviar
-    fetch("http://localhost:3000/actividades", {
+    fetch("http://localhost:89/actividades", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

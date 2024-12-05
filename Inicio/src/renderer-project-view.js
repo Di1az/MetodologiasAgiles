@@ -23,7 +23,7 @@ function loadActivities(projectData) {
 
     //renderProjectDetails(projectData);
 
-    fetch(`http://localhost:3000/proyectos/${projectDataFromStorage.idProyecto}`)
+    fetch(`http://localhost:89/proyectos/${projectDataFromStorage.idProyecto}`)
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -42,7 +42,7 @@ function loadActivities(projectData) {
     });
 
     // Obtener actividades específicas para este proyecto desde la API
-    fetch(`http://localhost:3000/actividades?project_id=${projectData.idProyecto}`)
+    fetch(`http://localhost:89/actividades?project_id=${projectData.idProyecto}`)
         .then((response) => response.json())
         .then((activities) => {
             console.log("Actividades del proyecto:", activities);
@@ -83,7 +83,7 @@ function loadActivities(projectData) {
 
                     try {
                         const response = await fetch(
-                            `http://localhost:3000/actividades/${activity.id_actividad}/cambiarEstado`,
+                            `http://localhost:89/actividades/${activity.id_actividad}/cambiarEstado`,
                             {
                                 method: "PUT",
                                 headers: {
@@ -124,7 +124,7 @@ function loadActivities(projectData) {
                     if (confirm("¿Estás seguro de que quieres eliminar esta actividad?")) {
                         try {
                             const response = await fetch(
-                                `http://localhost:3000/actividades/${activity.id_actividad}`,
+                                `http://localhost:89/actividades/${activity.id_actividad}`,
                                 {
                                     method: "DELETE",
                                     headers: {
@@ -155,7 +155,7 @@ function loadActivities(projectData) {
 
                     try {
                         const response = await fetch(
-                            `http://localhost:3000/actividades/${activity.id_actividad}/cambiarEstado`,
+                            `http://localhost:89/actividades/${activity.id_actividad}/cambiarEstado`,
                             {
                                 method: "PUT",
                                 headers: {
@@ -234,7 +234,7 @@ function loadActivities(projectData) {
 
         newDeleteButton.addEventListener("click", () => {
             if (confirm(`¿Seguro que deseas eliminar el proyecto "${projectData.name}"?`)) {
-                fetch("http://localhost:3000/proyectos", {
+                fetch("http://localhost:89/proyectos", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -260,7 +260,7 @@ function loadActivities(projectData) {
                             localStorage.removeItem("proy");
                         }
 
-                        return fetch(`http://localhost:3000/proyectos/${projectData.idProyecto}`, {
+                        return fetch(`http://localhost:89/proyectos/${projectData.idProyecto}`, {
                             method: "DELETE",
                             headers: {
                                 "Content-Type": "application/json",
@@ -327,7 +327,7 @@ ipcRenderer.on("load-project", (event) => {
 function obtenerTodosProyectos() {
     const projectData = JSON.parse(localStorage.getItem("proy"));
     //FETCH TO LOAD ALL PROYECTS
-    fetch("http://localhost:3000/proyectos", {
+    fetch("http://localhost:89/proyectos", {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -351,7 +351,7 @@ function obtenerTodosProyectos() {
 
 function obtenerTrabajadores(trabajadorData) {
     const projectData = JSON.parse(localStorage.getItem("proy"));
-    fetch(`http://localhost:3000/proyectos/trabajador/${trabajadorData}`, {
+    fetch(`http://localhost:89/proyectos/trabajador/${trabajadorData}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

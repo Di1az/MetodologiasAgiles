@@ -10,7 +10,7 @@ ipcRenderer.on("new-project", (event, projectData) => {
   // CAMBIAR FETCH POR APIGATEWAY EN FUTURAS VERSIONES
   //
   console.log(projectData, "data del proy");
-  fetch("http://localhost:3000/proyectos", {
+  fetch("http://localhost:89/proyectos", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
